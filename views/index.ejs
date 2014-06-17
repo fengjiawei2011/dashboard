@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title><%= title %></title>
+<link rel='stylesheet' href='/stylesheets/style.css' />
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script type="text/javascript" src="/js/jquery.flot.min.js"></script>
+<script type="text/javascript" src="/js/jquery.flot.time.js"></script>
+<script type="text/javascript" src="/js/jquery.flot.axislabels.js"></script>
+<script type="text/javascript">
+	var datasets = [];
+	datasets =<%-datasets%>;
+	function getOptions() {
+		return {
+			axisLabels : {
+				show : true
+			},
+			xaxis : {
+				mode : "time",
+				tickSize : [ 3, "month" ],
+				// tickSize: 1,
+				tickLength : 0,
+				axisLabel : "Time",
+				axisLabelUseCanvas : true,
+				axisLabelFontSizePixels : 12,
+				axisLabelFontFamily : 'Verdana, Arial',
+				axisLabelPadding : 10
+			},
+			yaxes : [ {
+				axisLabel : 'Alerts Number'
+			} ],
+			series : {
+				lines : {
+					show : true,
+					fill : false,
+					fillColor : {
+						colors : [ {
+							opacity : 0.7
+						}, {
+							opacity : 0.1
+						} ]
+					},
+					steps : false
+				},
+				points : {
+					radius : 0,
+					show : true
+				}
+			}
+		};
+	}
+
+	function getDataset(alertId, data) {
+		console.log(JSON.stringify(data));
+		return [ {
+			label : alertId,
+			data : data 
+		} ];
+	}
+
+	function drawChart(alertId, dataset) {
+		$('body').append("<div id="+alertId+" style='width: 700px; height: 300px'></div>");
+		$.plot($("#" + alertId), dataset, getOptions());
+	}
+	
+	function drawAllCharts(){
+		for(var i in datasets){
+			drawChart(datasets[i].alertId, getDataset(datasets[i].alertId,datasets[i].dataset));
+		}
+	}
+
+	$(document).ready(function() {
+		drawAllCharts();
+	});
+</script>
+</head>
+<body>
+</body>
+</html>
