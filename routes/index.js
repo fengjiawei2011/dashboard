@@ -32,10 +32,14 @@ function getAlertData(res, alertId){
 		return "inprocess";
 	}else{
 		var d = datasetArray;
-		datasetArray =[];
-		alertIdArray =[];
+		cleanArray();
 		res.render('index', { title: 'Express', alertType : 'A24', datasets:JSON.stringify(d)});
 	}
+}
+
+function cleanArray(){
+	datasetArray =[];
+	alertIdArray =[];
 }
 
 //return dataset array

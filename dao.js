@@ -52,7 +52,6 @@ exports.selectAlertId = function(callback){
 }
 
 function sortByAlertId(alertIds){
-	console.log("before sort :"+alertArray.length);
 	for(var i = 0; i < alertIds.length - 1; i++){
 		var min = parse2Int(alertIds[i]);
 		var minIndex = i; 
@@ -66,10 +65,10 @@ function sortByAlertId(alertIds){
 		alertIds[i] = 'A'+min;
 		alertIds[minIndex] = temp;
 	}
-	
-	console.log("after sort :"+alertArray.length); 
 }
 
 function parse2Int(alertId){
 	return parseInt(alertId.substring(1,alertId.length));
 }
+//this.getAlertData('A24');
+//this.getAlertId();

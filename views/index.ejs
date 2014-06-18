@@ -3,13 +3,32 @@
 <head>
 <title><%= title %></title>
 <link rel='stylesheet' href='/stylesheets/style.css' />
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
 <script type="text/javascript" src="/js/jquery.min.js"></script>
+<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 <script type="text/javascript" src="/js/jquery.flot.min.js"></script>
 <script type="text/javascript" src="/js/jquery.flot.time.js"></script>
 <script type="text/javascript" src="/js/jquery.flot.axislabels.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+<style type="text/css">
+
+.chart{
+	margin-bottom: 40px;
+	margin-left : 50px;
+	width: 630px;
+	height: 300px;
+}
+</style>
 <script type="text/javascript">
 	var datasets = [];
+	var datasetsSearched = [];
+	var gap = 3;
+	var type = "month";
+	var dateChangedFlag = false;
 	datasets =<%-datasets%>;
+	//console.log(JSON.stringify(datasets));
 	function getOptions() {
 		return {
 			axisLabels : {
@@ -17,7 +36,7 @@
 			},
 			xaxis : {
 				mode : "time",
-				tickSize : [ 3, "month" ],
+				tickSize : [ gap, type ],
 				// tickSize: 1,
 				tickLength : 0,
 				axisLabel : "Time",
@@ -27,7 +46,7 @@
 				axisLabelPadding : 10
 			},
 			yaxes : [ {
-				axisLabel : 'Alerts Number'
+				axisLabel : ''
 			} ],
 			series : {
 				lines : {
@@ -51,29 +70,198 @@
 	}
 
 	function getDataset(alertId, data) {
-		console.log(JSON.stringify(data));
+		//console.log(JSON.stringify(data));
 		return [ {
 			label : alertId,
 			data : data 
 		} ];
 	}
 
-	function drawChart(alertId, dataset) {
-		$('body').append("<div id="+alertId+" style='width: 700px; height: 300px'></div>");
+	function drawChart(alertId, dataset){
+		var $alertId = $("#"+alertId);
+		if($alertId.html() == '' || $alertId.html() == null ){
+			console.log("null");
+			$('#chartsContainer').append("<div class='col-md-6 chart' id="+alertId+" data-toggle='modal' data-target='#myModal'></div>");	
+		}			
 		$.plot($("#" + alertId), dataset, getOptions());
+		
 	}
 	
-	function drawAllCharts(){
+	function drawAllCharts(datasets){
 		for(var i in datasets){
 			drawChart(datasets[i].alertId, getDataset(datasets[i].alertId,datasets[i].dataset));
 		}
 	}
+	
+	function searchDataset(alertId){
+		for(var i in datasets){
+			if(datasets[i].alertId == alertId) return datasets[i].dataset;
+		}
+	}
+	
+	function getTo(){
+		return new Date($('#to').val()).getTime()
+	}
+	
+	function getFrom(){
+		return new Date($('#from').val()).getTime();
+	}
+	
+	function setType(t){
+		type = t ;
+	}
+	
+	function setGap(g){
+		gap = g;
+	}
+	
+	function searchDatasetByDate(from , to){
+		var newDatasets = [];
+		
+		for(var i in datasets){
+			var dataset = datasets[i].dataset;
+			var newDataset = {"alertId":datasets[i].alertId , "dataset":[]};
+			for(var j in dataset){
+				if(from == ''){
+					if( dataset[j][0] <= to){		
+						newDataset.dataset.push(dataset[j]);
+					}
+				}else if(to == ''){
+					if(dataset[j][0] >= from){		
+						newDataset.dataset.push(dataset[j]);
+					}
+				}else{
+					if(dataset[j][0] >= from && dataset[j][0] <= to){		
+						newDataset.dataset.push(dataset[j]);
+					}
+				}
+			}
+			newDatasets.push(newDataset);
+		}
+		console.log(JSON.stringify(newDatasets));
+		return newDatasets;
+	}
+	
+	
+	function init(){
+		$('#gap').val(gap);
+		$('#type').val(type);
+		$('.calendar').datepicker();
+		$('#from').change(function(){
+			dateChangedFlag = true;
+			console.log($('#from').val());
+			
+		});
+		
+		$('#to').change(function(){
+			dateChangedFlag = true;
+			console.log($('#to').val());	
+		});
+	}
+	
+	function initMemory(){
+		dateChangedFlag = false;
+	}
+	
+	$(function(){
+		init();
+		drawAllCharts(datasets);
+		/* $('.chart').click(function(){
+			var id = $(this).attr('id');
+			var dataset = searchDataset(id);
+			console.log(dataset);
+			$.plot($('.modal-body.chart'), dataset, getOptions());
+		});	 */
 
-	$(document).ready(function() {
-		drawAllCharts();
+		$('#gap').change(function(){		
+			setGap($('#gap').val());
+			//console.log(JSON.stringify(getOptions()));
+			
+		});
+		
+		$('#type').change(function(){
+			setType($('#type').val());
+			//console.log(JSON.stringify(getOptions()));
+		});
+		
+		$('#filter button').click(function(){
+			//console.log(dateToChangedFlag + " -  " + dateFromChangedFlag)
+			if( dateChangedFlag){
+				var fromTime =$('#from').val();
+				var toTime = $('#to').val(); 
+				if(fromTime == '' || fromTime == null){
+					datasetsSearched = searchDatasetByDate('',new Date(toTime).getTime());
+				}else if(toTime == '' || toTime == null){
+					datasetsSearched = searchDatasetByDate(new Date(fromTime).getTime(),'');
+				}else{
+					datasetsSearched = searchDatasetByDate(new Date(fromTime).getTime(),new Date(toTime).getTime());
+				}
+				
+				console.log("search");
+				
+				drawAllCharts(datasetsSearched);
+			}else{
+				if(datasetsSearched.length == 0){
+					console.log("draw all");
+					drawAllCharts(datasets);
+				}else{
+					console.log("draw searched");
+					drawAllCharts(datasetsSearched);
+				}
+				
+			}		
+			initMemory();	
+		});
+	
 	});
 </script>
 </head>
 <body>
+	
+	<div style="margin-left: auto;margin-right: auto; width: 80%">
+		<div id="filter" style="margin-left: auto;margin-right: auto; margin-bottom:30px; width: 80%">
+			Gap :<select id="gap">
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+			</select>
+			
+			Type : <select id="type">
+				<option>day</option>
+				<option>month</option>
+				<option>year</option>
+			</select>
+			
+			<span>from : <input type='text' id='from' class='calendar' /></span>
+			<span>To   :<input type='text' id='to' class='calendar' /></span>	
+			
+			<button>go</button>
+		</div>
+		<div id="chartsContainer" class="row"></div>
+	</div>
+
+	<!-- <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Modal title</h4>
+				</div>
+				<div class="modal-body chart">
+				 	<div class="chart" style="width:650px; width=650px;height: 300px"></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary">Save changes</button>
+				</div>
+		   	</div>
+		</div>
+	</div> -->
 </body>
 </html>
