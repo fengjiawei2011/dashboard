@@ -23,4 +23,33 @@ function getDataByAlertId(id){
 	}
 }
 
-getDataByAlertId(ids.shift())
+
+function JSONTest(){
+	var obj = {
+		"Frank" : "Feng",
+		toJSON: function(){
+			return "Jiawei";
+		}
+	};
+	
+	console.log(JSON.stringify({"x":obj}));
+}
+
+
+var person = {
+	    firstName : "John",
+	    lastName  : "Doe",
+	    age       : 50,
+	    eyeColor  : "blue",
+	    abc       : function(){
+	    	console.log("good");
+	    }
+	};
+
+	
+	console.log(JSON.stringify(person));
+	person.abc();
+//JSONTest();
+//getDataByAlertId(ids.shift())
+//var d = new Date("2014/2/09");
+//var d1 = new Date(d.getTime());

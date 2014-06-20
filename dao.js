@@ -20,17 +20,44 @@ exports.insertAllDataFromCSV = function(alertId, aLertTime, alertValue, alertTyp
 	});	  
 };
 
-exports.queryAlertDataByAlertId = function(alertId,callback){
-	var queryString = "SELECT * FROM ALERT_HISTORY WHERE ALERT_ID = '"+alertId+"' ORDER BY ALERT_TIME ASC";
+exports.insertMateData = function(row){
+	connection.query("INSERT INTO ALERT_MATEDATA SET ?", row , function(err, result){
+		if(err) throw err;
+		console.log("insert successfully ============" + result);	
+	});
+}
+
+exports.queryAlertDataByAlertIdV1 = function(alertId, callback){
+	var queryString = "SELECT * FROM ALERT_HISTORY a JOIN ALERT_MATEDATA b ON a.ALERT_ID=b.ALERT_ID WHERE a.ALERT_ID = '"+alertId+"' ORDER BY a.ALERT_TIME ASC";
 	connection.query(queryString, function(err, rows, fields) {
 	    if (err) throw err;
-	    var data = {alertId : alertId, alertData:[]};
+	    callback(rows);
+	});	 
+}
+
+
+exports.selectAlertIdV1 = function(callback){
+	var queryString = "SELECT distinct(ALERT_ID) FROM ALERT_HISTORY";
+	connection.query(queryString, function(err,rows,fields){
+		if(err) throw err;	
+		callback(rows);
+	});
+}
+
+/*
+ * not good code
+ * 
+exports.queryAlertDataByAlertId = function(alertId,callback){
+	var queryString = "SELECT * FROM ALERT_HISTORY a JOIN ALERT_MATEDATA b ON a.ALERT_ID=b.ALERT_ID WHERE a.ALERT_ID = '"+alertId+"' ORDER BY a.ALERT_TIME ASC";
+	connection.query(queryString, function(err, rows, fields) {
+	    if (err) throw err;
+	    var data = {alertId : alertId, alertData:[], matedata : {}};
+	    console.log(rows);
 	    for (var i in rows) {
 	    	delete rows[i].ID;
 	    	delete rows[i].ALERT_ID;
 	    	data.alertData.push(rows[i]);
 	    }
-	   // console.log("data"+data)
 	    callback(data);
 	});	 
 }
@@ -40,6 +67,7 @@ exports.selectAlertId = function(callback){
 	//var aa = [];
 	connection.query(queryString, function(err,rows,fields){
 		if(err) throw err;	
+		console.log(rows);
 		var alertArray = [];
 		for(var i in rows){
 			alertArray.push(rows[i].ALERT_ID);
@@ -51,24 +79,4 @@ exports.selectAlertId = function(callback){
 	});
 }
 
-function sortByAlertId(alertIds){
-	for(var i = 0; i < alertIds.length - 1; i++){
-		var min = parse2Int(alertIds[i]);
-		var minIndex = i; 
-		for(var j = i+1; j < alertIds.length; j++){
-			if( min > parse2Int(alertIds[j])){
-				min  = parse2Int(alertIds[j]);
-				minIndex = j;
-			}
-		}
-		var temp = alertIds[i];
-		alertIds[i] = 'A'+min;
-		alertIds[minIndex] = temp;
-	}
-}
-
-function parse2Int(alertId){
-	return parseInt(alertId.substring(1,alertId.length));
-}
-//this.getAlertData('A24');
-//this.getAlertId();
+*/

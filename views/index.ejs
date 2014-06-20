@@ -22,6 +22,7 @@
 }
 </style>
 <script type="text/javascript">
+	console.log(typeof(Storage));
 	var datasets = [];
 	var datasetsSearched = [];
 	var gap = 3;
@@ -80,7 +81,7 @@
 	function drawChart(alertId, dataset){
 		var $alertId = $("#"+alertId);
 		if($alertId.html() == '' || $alertId.html() == null ){
-			console.log("null");
+			//console.log("null");
 			$('#chartsContainer').append("<div class='col-md-6 chart' id="+alertId+" data-toggle='modal' data-target='#myModal'></div>");	
 		}			
 		$.plot($("#" + alertId), dataset, getOptions());
