@@ -5,7 +5,7 @@ function Dashboard(datasets){ // datasets is an array
 	 this.lineCharts = []; // flotLineChartArray --- to save all line charts 
 	 this.datasets = datasets;
 	 //console.log(datasets);
-	 this.init = function(callback){
+	 this.initLineChartsArray = function(callback){
 		 for(var i = 0; i < this.datasets.length; i++){
 			 var alertId = this.datasets[i].alertId;
 			 var dataset = this.myUtil.parse2FlotDataset(alertId, this.datasets[i].alertData);
@@ -24,26 +24,76 @@ function Dashboard(datasets){ // datasets is an array
 		 }
 	 }; 
 	 
-	 this.draw = function(){
+	 // layout the whole dashboard GUI
+	 this.layout = function(){
 		 this.drawAlertsMonitor();
 		 this.drawDateFilter();
+		 this.drawChartsContainer();
 		 this.drawDialog();
 	 }
 	 
-	 this.drawAlertsMonitor = function(){};
+	 this.drawAlertsMonitor = function(){
+		 var html = "<div id='monitor' class='row'>";
+		 
+		 for(var i = 0 ; i < this.datasets.length; i++ ){
+			 html    += '<div  class="col-md-1" style="margin-bottom: 10px">';
+			 if(this.datasets[i].matedata.alertFlag === 'Y')
+				 html    += '<button  type="button" class="btn btn-success btn-block">';
+			 else 
+				 html    += '<button  type="button" class="btn btn-danger btn-block">';
+			 html    += this.datasets[i].alertId;
+			 html    += '<br/>';
+			 html    += this.datasets[i].alertData[this.datasets[i].alertData.length-1].alertValue;
+			 html    += '</button></div>';
+		 } 
+	
+		 html    += '</div>';
+		 
+		 $("#dashboard").append(html);
+	 };
 	 
 	 this.drawDateFilter = function(){
-		 var html = "<span>From : <input type='text' id='from' class='calendar' /></span>";
+		 var html = "<div id='filter' style='margin-left: auto;margin-right: auto; margin-bottom:30px; width: 80%'></div>";
+		 html    += "<span>From : <input type='text' id='from' class='calendar' /></span>";
 		 html    += "<span>To   :<input type='text' id='to' class='calendar' /></span>";
 		 html    += "<button>go</button>";
-		 $("#filter").append(html);
+		 html    += "</div>";
+		 
+		 $("#dashboard").append(html);
 		 $( ".calendar" ).datepicker({
 		      changeMonth: true,
 		      changeYear: true
 		 });	 
 	 };
 	 
-	 this.drawDialog = function(){};
+	 this.drawChartsContainer = function(){
+		 var html = "<div id='chartsContainer' class='row'>";
+		 html    += '</div>';
+		 $("#dashboard").append(html);
+	 };
+	 
+	 this.drawDialog = function(){
+		 var html = '<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">';
+		 html    += '<div class="modal-dialog modal-lg">';
+		 html    += '<div class="modal-content">';
+		 html    += '<div class="modal-header">';
+		 html    += '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>';
+		 html    += '<h4 class="modal-title" id="myModalLabel">Matedata</h4>';
+		 html    += '</div>';
+		 
+		 html    += '<div class="modal-body">';
+		 html    += '';  // add matedata here 
+		 html    += '</div>';
+		 
+//		 html    += '<div class="modal-footer">';
+//		 html    += '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
+//		 html    += '<button type="button" class="btn btn-primary">Save changes</button>';
+//		 html    += '</div>';
+		 
+		 html    += '</div></div></div>';
+		 
+		 $("body").append(html);
+	 };
 	 this.search = function(from , to){};
 }
 
@@ -57,11 +107,11 @@ function FlotLineChart(alertId, dataset, matedata){
 	// draw chart
 	this.draw = function(){	
 		if($("#"+this.alertId).html() == '' || $("#"+this.alertId).html() == null ){
-			
+
 			var html = "<div class='col-md-6 chart' id='"+this.alertId+"' data-toggle='modal' data-target='#myModal1'></div>";
-			
+
 			$('#chartsContainer').append(html);
-			
+
 		}	
 		$.plot($("#"+this.alertId), this.dataset, this.option);
 	}; 
@@ -134,5 +184,5 @@ function MyUtil(){
 	};
 }
 
-var f = new FlotLineChart();
+//var f = new FlotLineChart();
 //console.log(f.setOption());
