@@ -20,7 +20,10 @@ function Dashboard(datasets){ // datasets is an array
 	 // draw all line charts
 	 this.drawLineCharts = function(){ 
 		 for(var i = 0; i < this.lineCharts.length; i++){
-			this.lineCharts[i].draw();
+			var dataset = this.lineCharts[i].getDataset();
+			//var from = dataset[0].data[0][0];
+			//var to = dataset[0].data[dataset[0].data.length-1][0];
+			this.lineCharts[i].draw( dataset );
 		 }
 	 }; 
 	 
@@ -94,8 +97,14 @@ function Dashboard(datasets){ // datasets is an array
 		 
 		 $("body").append(html);
 	 };
-	 this.search = function(from , to){
-		 console.log( to.getFullYear() + "-" + (to.getMonth() + 1) + "-" + to.getDate() );
+	 this.search = function(from , to, callback){
+		 $.blockUI(); 
+		 for(var i = 0 ; i < this.lineCharts.length; i++){
+			 var ds =  this.lineCharts[i].filterByDate( from , to );
+			 //console.log(JSON.stringify(ds));
+			 this.lineCharts[i].draw( ds );
+		 }
+		 callback();
 	 };
 }
 
@@ -107,23 +116,28 @@ function FlotLineChart(alertId, dataset, matedata){
 	this.option = new Option(); // it is a object of line chart option for customizing line chart
 	
 	// draw chart
-	this.draw = function(){	
+	this.draw = function( dataset ){	
+		//console.log(JSON.stringify(dataset));
 		if($("#"+this.alertId).html() == '' || $("#"+this.alertId).html() == null ){
 			var html = "<div class='col-md-6 chart' id='";
 			html    += this.alertId;
 			html    += "' data-toggle='modal' data-target='#myModal1'></div>";		
 			$('#chartsContainer').append(html);
 		}	
-		this.improveDateAppranceOnXaxis();
-		$.plot($("#"+this.alertId), this.dataset, this.option.getOption());
+		this.improveDateAppranceOnXaxis( dataset );
+		$.plot($("#"+this.alertId), dataset, this.option.getOption());
 	}; 
 	
-	this.improveDateAppranceOnXaxis = function(){
-		//console.log(this.dataset[0].label+ "=" +new Date(this.dataset[0].data[this.dataset[0].data.length-1][0]));
+	this.improveDateAppranceOnXaxis = function(dataset){
+		if(dataset[0].data.length === 0){
+			return;
+		}
+		var from = dataset[0].data[0][0];
+		var to = dataset[0].data[dataset[0].data.length-1][0];
 		// get first date in dataset
-		var firstDate = new Date(this.dataset[0].data[0][0]);
+		var firstDate = new Date(from);
 		//get last date in dataset
-		var lastDate = new Date(this.dataset[0].data[this.dataset[0].data.length-1][0]);
+		var lastDate = new Date(to);
 		
 		var yearOfFirst = firstDate.getFullYear(),
 			monthOfFirst = firstDate.getMonth() + 1,
@@ -138,30 +152,50 @@ function FlotLineChart(alertId, dataset, matedata){
 			if(monthOfFirst === monthOfFLast){
 				this.option.setTickSize(1, "day");
 				this.option.setAlertName(alertName);
-				this.setLabel(this.alertId + "( "+ (parseInt(monthOfFirst) < 10 ? '0'+monthOfFirst : monthOfFirst) + "/" + yearOfFirst + " )");
+				//this.setLabel(this.alertId + "( "+ (parseInt(monthOfFirst) < 10 ? '0'+monthOfFirst : monthOfFirst) + "/" + yearOfFirst + " )");
+				dataset[0].label = this.alertId + "( "+ (parseInt(monthOfFirst) < 10 ? '0'+monthOfFirst : monthOfFirst) + "/" + yearOfFirst + " )";
 			}else if( (monthOfFLast - monthOfFirst) > 3 ){
 				this.option.setTickSize(1, "month");
 				this.option.setAlertName(alertName);
-				this.setLabel(this.alertId + "( "+ yearOfFirst + " )");
+				//this.setLabel(this.alertId + "( "+ yearOfFirst + " )");
+				dataset[0].label = this.alertId + "( "+ yearOfFirst + " )";
 			}else{
 				this.option.setTickSize(7, "day");
 				this.option.setAlertName(alertName);
-				this.setLabel(this.alertId + "( "+ yearOfFirst + " )");
+				//this.setLabel(this.alertId + "( "+ yearOfFirst + " )");
+				dataset[0].label = this.alertId + "( "+ yearOfFirst + " )";
 			}
 		}else if( (yearOfLast - yearOfFirst) > 3){
 			this.option.setTickSize(1, "year");
 			this.option.setAlertName(alertName);
-			this.setLabel(this.alertId + "( "+ yearOfFirst + " - "+ yearOfLast + " )");
+			//this.setLabel(this.alertId + "( "+ yearOfFirst + " - "+ yearOfLast + " )");
+			dataset[0].label = this.alertId + "( "+ yearOfFirst + " - "+ yearOfLast + " )";
 		}else{
 			this.option.setTickSize(2, "month");
 			this.option.setAlertName(alertName);
-			this.setLabel(this.alertId + "( "+ yearOfFirst + " - "+ yearOfLast + " )");
+			//this.setLabel(this.alertId + "( "+ yearOfFirst + " - "+ yearOfLast + " )");
+			dataset[0].label = this.alertId + "( "+ yearOfFirst + " - "+ yearOfLast + " )";
 		}
 	};
 	
-	this.setLabel = function(label){
-		this.dataset[0].label = label;
+	
+	//return new datasets
+	this.filterByDate = function(from , to){
+		var ds = this.dataset[0].data;
+		var newDS = [];
+		for(var i = 0; i < ds.length; i++){
+			if(ds[i][0] >= from && ds[i][0] <= to){
+				newDS.push(ds[i]);
+			}
+		}
+		return [{
+			label : this.alertId,
+			data  : newDS
+		}];
 	};
+	
+	this.setLabel   = function(label){this.dataset[0].label = label;};
+	this.getDataset = function(){return this.dataset;};
 }
 
 // class Option for line chart 
@@ -178,7 +212,7 @@ function Option(){
 	this.setTimeFormat = function(){};
 	
 	this.getOption = function(){
-		console.log(this.option);
+		//console.log(this.option);
 		if(JSON.stringify(this.option) !== '{}') return this.option;
 		else return this.getDefault();	
 	};
@@ -239,7 +273,7 @@ function MyUtil(){
 		}
 		return [ {
 			label : alertId,
-			data : flotFormatDataset,
+			data : flotFormatDataset
 			//hoverable: true
 		} ];
 	};

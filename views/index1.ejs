@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
 <script type="text/javascript" src="/js/jquery.min.js"></script>
+<script type="text/javascript" src="/js/jquery.blockUI.js"></script>
 <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 <script type="text/javascript" src="/js/jquery.flot.min.js"></script>
 <script type="text/javascript" src="/js/jquery.flot.time.js"></script>
@@ -21,18 +22,22 @@
 	height: 300px;
 }
 </style>
-<script type="text/javascript">
+<script type="text/javascript"> 
 $(function(){
 	var dashboard = new Dashboard(<%-datasets%>);
 	dashboard.layout();
  	dashboard.initLineChartsArray(function(){
  		dashboard.drawLineCharts();
+ 		$.unblockUI();
  	});	
  	
  	$('#filter button').click(function(){
- 		var from = new Date($('from').val());
-		var to = new Date($('#to').val());	
- 		dashboard.search(from, to);
+ 		//$.unblockUI();
+ 		var from = new Date($('#from').val()).getTime();
+		var to = new Date($('#to').val()).getTime();	
+ 		dashboard.search(from, to, function(){
+ 			//$.unblockUI();
+ 		});
  	});
 });
  	
