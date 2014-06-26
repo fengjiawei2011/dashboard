@@ -6,45 +6,59 @@ var alertIdArray = [];
 
 exports.index = function(req, res){	
 	dao.selectAlertIdV1(function(rows){
-		getSortedAlertIdArray(rows);
+		alertIdArray = getSortedAlertIdArray(rows);
 		var temp = alertIdArray.shift();
 		getAlertData(res , temp);	
 	});
 	console.log("finally done");	
 }
 
+// get raw data in DB sorted 
 function getSortedAlertIdArray(dbRows){
+	var array = [];
 	for(var i in dbRows){
-		alertIdArray.push(dbRows[i].ALERT_ID);
+		array.push(dbRows[i].ALERT_ID);
 	}
-	sortByAlertId(alertIdArray);
+	// sort algorithms 
+	sortByAlertId(array);
+	
+	return array;
 }
 
-function getAlertData(res, alertId){
+
+function getAlertData(response, alertId){
 	if(alertId){
-		//console.log("alertId = " + alertId);
 		dao.queryAlertDataByAlertIdV1(alertId,function(rows){
 			var alertData = parse2JSON(alertId, rows);
-			var convertedData = parse2FlotDatasetFormat(alertData);		
-			datasetArray.push(convertedData);
-			//console.log(datasetArray);
-			return getAlertData(res,alertIdArray.shift());
+			//var convertedData = parse2FlotDatasetFormat(alertData);		
+			datasetArray.push(alertData);
+			//datasetArray = rows;
+			//datasetArray.push(rows);	
+			return getAlertData(response,alertIdArray.shift());
 		});
-		return "inprocess";
+		//return "inprocess";
 	}else{
+		console.log(datasetArray);
 		var d = datasetArray;
 		cleanArray();
-		res.render('index', { title: 'Express', alertType : 'A24', datasets:JSON.stringify(d)});
+		response.render('index1', { title: 'Express', datasets:JSON.stringify(d)});
 	}
 }
 
 // get data from mysql , then parse them to JSON format data
 function parse2JSON(alertId, dbRows){
 	var data = {alertId : alertId, alertData:[], matedata : {}};
+	data.matedata = getMatedata(dbRows[0]);
     for (var i in dbRows) {
-    	delete dbRows[i].ID;
-    	delete dbRows[i].ALERT_ID;
-    	data.alertData.push(dbRows[i]);
+    	//delete dbRows[i].ID;
+    	//delete dbRows[i].ALERT_ID;
+    	var temp = {};
+    	temp.alertTime = dbRows[i].ALERT_TIME;
+    	temp.alertValue = dbRows[i].ALERT_VALUE;
+    	temp.alertType = dbRows[i].ALERT_TYPE;
+    	data.alertData.push(temp);
+    	//data.matedata.sql = dbRows[i].QUERY_INFO;
+    	//data.matedata.alertName = dbRows[i].ALERT_NAME;
     }
     return data;
 }
@@ -52,6 +66,24 @@ function parse2JSON(alertId, dbRows){
 function cleanArray(){
 	datasetArray =[];
 	alertIdArray =[];
+}
+
+
+//get matedata from query result 
+function getMatedata(row){
+	var matedata = {};
+	matedata.sql = row.QUERY_INFO;
+	matedata.alertName = row.ALERT_NAME;
+	matedata.frequency = row.FREQUENCY;
+	matedata.threshold = row.THRESHOLD_VALUE;
+	matedata.warningStart = row.WARNING_START;
+	matedata.warningEnd = row.WARNING_END;
+	matedata.alertStart = row.ALERT_START;
+	matedata.alertEnd = row.ALERT_END;
+	matedata.alertFlag = row.ALERT_FLAG;
+	matedata.mailList = row.MAIL_LIST;
+	matedata.taskType = row.TASK_TYPE;
+	return matedata;
 }
 
 //sort alert id array
@@ -71,30 +103,13 @@ function sortByAlertId(alertIds){
 	}
 }
 
+
+//parse alert id to INT which is used to sort
 function parse2Int(alertId){
 	return parseInt(alertId.substring(1,alertId.length));
 }
 
-//return flot format datasets
-function parse2FlotDatasetFormat(alertData){
-	var datasets = {};
-	var dataset = alertData.alertData; 
-	var flotFormatDataset = [];
-	for(var i = 0; i < dataset.length; i++){
-		var time = new Date(dataset[i].ALERT_TIME).getTime();
-		var temp = [time, dataset[i].ALERT_VALUE];
-		flotFormatDataset.push(temp);
-	}
-	datasets['alertId'] = alertData.alertId;
-	datasets['dataset'] = flotFormatDataset;
-	return datasets;
-}
 
-function gd(year, month, day) {
-    return new Date(year, month, day).getTime();
-}
-
-//this.index();
 
 /*
  * get data from excel

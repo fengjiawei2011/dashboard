@@ -16,39 +16,37 @@
 
 .chart{
 	margin-bottom: 40px;
-	margin-left : 50px;
+	margin-left : 0px;
 	width: 630px;
 	height: 300px;
 }
 </style>
 <script type="text/javascript">
-	console.log(typeof(Storage));
-	var datasets = [];
+	//console.log(typeof(Storage));
+	var datasets =<%-datasets%>;
 	var datasetsSearched = [];
 	var gap = 3;
 	var type = "month";
 	var dateChangedFlag = false;
-	datasets =<%-datasets%>;
 	//console.log(JSON.stringify(datasets));
-	function getOptions() {
+	//console.log(datasets[0].matedata);
+	function getOptions(alertName) {
 		return {
 			axisLabels : {
 				show : true
 			},
-			xaxis : {
-				mode : "time",
+			xaxis :{
+				mode : 'time',
+				//timeformat : '%m/%d/%y',
 				tickSize : [ gap, type ],
 				// tickSize: 1,
-				tickLength : 0,
-				axisLabel : "Time",
+				//tickLength : 0,
+				axisLabel :alertName,
 				axisLabelUseCanvas : true,
 				axisLabelFontSizePixels : 12,
 				axisLabelFontFamily : 'Verdana, Arial',
 				axisLabelPadding : 10
-			},
-			yaxes : [ {
-				axisLabel : ''
-			} ],
+			}, 
 			series : {
 				lines : {
 					show : true,
@@ -63,42 +61,137 @@
 					steps : false
 				},
 				points : {
-					radius : 0,
+					radius : 5,
 					show : true
 				}
-			}
+			},
+		    grid: {
+		        hoverable: true,
+		        borderWidth: 2,
+		        mouseActiveRadius: 50,
+		        //backgroundColor: { colors: ["#ffffff", "#EDF5FF"] },
+		        axisMargin: 20,
+		    }
 		};
 	}
-
-	function getDataset(alertId, data) {
-		//console.log(JSON.stringify(data));
+	
+	function parse2FlotDataset(alertId, alertData) {
+		//console.log(JSON.stringify(alertData));
+		var flotFormatDataset = [];
+		for(var i = 0; i < alertData.length; i++){
+			var time = new Date(alertData[i].alertTime).getTime();
+			var temp = [time, alertData[i].alertValue];
+			flotFormatDataset.push(temp);
+		}
 		return [ {
 			label : alertId,
-			data : data 
+			data : flotFormatDataset,
+			hoverable: true
 		} ];
 	}
 
-	function drawChart(alertId, dataset){
+	function drawChart(alertId, dataset, alertName){
 		var $alertId = $("#"+alertId);
 		if($alertId.html() == '' || $alertId.html() == null ){
 			//console.log("null");
-			$('#chartsContainer').append("<div class='col-md-6 chart' id="+alertId+" data-toggle='modal' data-target='#myModal'></div>");	
+			$('#chartsContainer').append("<div class='col-md-6 chart' id="+alertId+" data-toggle='modal' data-target='#myModal1'></div>");	
 		}			
-		$.plot($("#" + alertId), dataset, getOptions());
+		$.plot($("#" + alertId), dataset, getOptions(alertName));
 		
 	}
 	
 	function drawAllCharts(datasets){
+		//$('#chartsContainer').html('');
 		for(var i in datasets){
-			drawChart(datasets[i].alertId, getDataset(datasets[i].alertId,datasets[i].dataset));
+			//if(datasets[i].dataset.length !== 0)
+			var alertId = datasets[i].alertId;
+			var alertDataset = parse2FlotDataset(alertId,datasets[i].alertData);
+			var alertName = datasets[i].matedata.alertName
+			drawChart(alertId, alertDataset, alertName);
 		}
 	}
 	
+	
+	//get new dataset by filtering date
+	function searchDatasetByDate(from , to){
+		var newDatasets = [];
+		
+		for(var i in datasets){
+			var dataset = datasets[i].alertData;
+			var newDataset = {"alertId":datasets[i].alertId , "alertData":[], matedata: datasets[i].matedata};
+			for(var j in dataset){
+				if(from === ''){
+					if( new Date(dataset[j].alertTime).getTime() <= to){	
+						newDataset.alertData.push(dataset[j]);
+					}
+				}else if(to === ''){
+					if(new Date(dataset[j].alertTime).getTime() >= from){		
+						newDataset.alertData.push(dataset[j]);
+					}
+				}else{
+					if(new Date(dataset[j].alertTime).getTime() >= from && new Date(dataset[j].alertTime).getTime() <= to){		
+						newDataset.alertData.push(dataset[j]);
+					}
+				}
+			}
+			newDatasets.push(newDataset);
+		}
+		console.log(JSON.stringify(newDatasets));
+		return newDatasets;
+	}
+	
+	function getSql(id){
+		for(var i in datasets){
+			if(datasets[i].alertId === id)
+				return datasets[i].matedata.sql;
+			//alert("no alert id found !");
+		}
+	}
+	
+	function init(){
+		$('#gap').val(gap);
+		$('#type').val(type);
+		$('.calendar').datepicker();
+		$('#from').change(function(){
+			dateChangedFlag = true;
+			//console.log($('#from').val());
+			
+		});
+		
+		$('#to').change(function(){
+			dateChangedFlag = true;
+			//console.log($('#to').val());	
+		});
+	}
+	
+	function initMemory(){
+		dateChangedFlag = false;
+	}
+	
+	/*
 	function searchDataset(alertId){
 		for(var i in datasets){
 			if(datasets[i].alertId == alertId) return datasets[i].dataset;
 		}
 	}
+	
+     //return flot format datasets
+	function parse2FlotDatasetFormat(alertData){
+		var datasets = {};
+		var dataset = alertData.alertData; 
+		var flotFormatDataset = [];
+		for(var i = 0; i < dataset.length; i++){
+			var time = new Date(dataset[i].alertTime).getTime();
+			var temp = [time, dataset[i].alertValue];
+			flotFormatDataset.push(temp);
+		}
+		datasets['alertId'] = alertData.alertId;
+		datasets['dataset'] = flotFormatDataset;
+		datasets['matedata'] = alertData.matedata;
+		return datasets;
+	}
+
+	*/
 	
 	function getTo(){
 		return new Date($('#to').val()).getTime()
@@ -116,68 +209,21 @@
 		gap = g;
 	}
 	
-	function searchDatasetByDate(from , to){
-		var newDatasets = [];
-		
-		for(var i in datasets){
-			var dataset = datasets[i].dataset;
-			var newDataset = {"alertId":datasets[i].alertId , "dataset":[]};
-			for(var j in dataset){
-				if(from == ''){
-					if( dataset[j][0] <= to){		
-						newDataset.dataset.push(dataset[j]);
-					}
-				}else if(to == ''){
-					if(dataset[j][0] >= from){		
-						newDataset.dataset.push(dataset[j]);
-					}
-				}else{
-					if(dataset[j][0] >= from && dataset[j][0] <= to){		
-						newDataset.dataset.push(dataset[j]);
-					}
-				}
-			}
-			newDatasets.push(newDataset);
-		}
-		console.log(JSON.stringify(newDatasets));
-		return newDatasets;
-	}
-	
-	
-	function init(){
-		$('#gap').val(gap);
-		$('#type').val(type);
-		$('.calendar').datepicker();
-		$('#from').change(function(){
-			dateChangedFlag = true;
-			console.log($('#from').val());
-			
-		});
-		
-		$('#to').change(function(){
-			dateChangedFlag = true;
-			console.log($('#to').val());	
-		});
-	}
-	
-	function initMemory(){
-		dateChangedFlag = false;
-	}
 	
 	$(function(){
 		init();
 		drawAllCharts(datasets);
-		/* $('.chart').click(function(){
-			var id = $(this).attr('id');
-			var dataset = searchDataset(id);
-			console.log(dataset);
-			$.plot($('.modal-body.chart'), dataset, getOptions());
-		});	 */
 
 		$('#gap').change(function(){		
 			setGap($('#gap').val());
 			//console.log(JSON.stringify(getOptions()));
 			
+		});
+		
+		$('.chart1').click(function(){
+			var id = $(this).attr('id');
+			var sql = getSql(id);
+			$('.modal-body').html(sql);
 		});
 		
 		$('#type').change(function(){
@@ -219,7 +265,7 @@
 </head>
 <body>
 	
-	<div style="margin-left: auto;margin-right: auto; width: 80%">
+	<div style="margin-left: auto;margin-right: auto; width: 100%">
 		<div id="filter" style="margin-left: auto;margin-right: auto; margin-bottom:30px; width: 80%">
 			Gap :<select id="gap">
 				<option value="1">1</option>
@@ -245,24 +291,24 @@
 		<div id="chartsContainer" class="row"></div>
 	</div>
 
-	<!-- <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+	 <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
 		aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal"
 						aria-hidden="true">&times;</button>
-					<h4 class="modal-title" id="myModalLabel">Modal title</h4>
+					<h4 class="modal-title" id="myModalLabel">Query Information</h4>
 				</div>
-				<div class="modal-body chart">
-				 	<div class="chart" style="width:650px; width=650px;height: 300px"></div>
+				<div class="modal-body">
+				 	
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary">Save changes</button>
+					<!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary">Save changes</button> -->
 				</div>
 		   	</div>
 		</div>
-	</div> -->
+	</div> 
 </body>
 </html>
