@@ -12,7 +12,7 @@ function Dashboard(datasets){ // datasets is an array
 			 var matedata = datasets[i].matedata;
 			 var flotLineChart = new FlotLineChart(alertId, dataset , matedata);
 			 this.lineCharts.push(flotLineChart); 
-			
+			// flotLineChart.draw();
 		 }
 		callback();
 	 };
@@ -53,7 +53,7 @@ function Dashboard(datasets){ // datasets is an array
 	 };
 	 
 	 this.drawDateFilter = function(){
-		 var html = "<div id='filter' style='margin-left: auto;margin-right: auto; margin-bottom:30px; width: 80%'></div>";
+		 var html = "<div id='filter' style='margin-left: auto;margin-right: auto; margin-bottom:30px; width: 80%'>";
 		 html    += "<span>From : <input type='text' id='from' class='calendar' /></span>";
 		 html    += "<span>To   :<input type='text' id='to' class='calendar' /></span>";
 		 html    += "<button>go</button>";
@@ -94,7 +94,9 @@ function Dashboard(datasets){ // datasets is an array
 		 
 		 $("body").append(html);
 	 };
-	 this.search = function(from , to){};
+	 this.search = function(from , to){
+		 console.log( to.getFullYear() + "-" + (to.getMonth() + 1) + "-" + to.getDate() );
+	 };
 }
 
 // class FlotLineChart
@@ -102,26 +104,84 @@ function FlotLineChart(alertId, dataset, matedata){
 	this.alertId = alertId;
 	this.dataset = dataset; // JSON format dataset like {alertId : '', alertData : [{},{}], matedata : {} }
 	this.matedata = matedata;
-	this.option = new Option().getDefault(); // it is a object of line chart option for customizing line chart
+	this.option = new Option(); // it is a object of line chart option for customizing line chart
 	
 	// draw chart
 	this.draw = function(){	
 		if($("#"+this.alertId).html() == '' || $("#"+this.alertId).html() == null ){
-
-			var html = "<div class='col-md-6 chart' id='"+this.alertId+"' data-toggle='modal' data-target='#myModal1'></div>";
-
+			var html = "<div class='col-md-6 chart' id='";
+			html    += this.alertId;
+			html    += "' data-toggle='modal' data-target='#myModal1'></div>";		
 			$('#chartsContainer').append(html);
-
 		}	
-		$.plot($("#"+this.alertId), this.dataset, this.option);
+		this.improveDateAppranceOnXaxis();
+		$.plot($("#"+this.alertId), this.dataset, this.option.getOption());
 	}; 
+	
+	this.improveDateAppranceOnXaxis = function(){
+		//console.log(this.dataset[0].label+ "=" +new Date(this.dataset[0].data[this.dataset[0].data.length-1][0]));
+		// get first date in dataset
+		var firstDate = new Date(this.dataset[0].data[0][0]);
+		//get last date in dataset
+		var lastDate = new Date(this.dataset[0].data[this.dataset[0].data.length-1][0]);
+		
+		var yearOfFirst = firstDate.getFullYear(),
+			monthOfFirst = firstDate.getMonth() + 1,
+			dateOfFirst = firstDate.getDate();
+		
+		var yearOfLast = lastDate.getFullYear(),
+			monthOfFLast = lastDate.getMonth() + 1,
+			dateOfLast = lastDate.getDate();
+		
+		var alertName = this.matedata.alertName;
+		if(yearOfFirst === yearOfLast){
+			if(monthOfFirst === monthOfFLast){
+				this.option.setTickSize(1, "day");
+				this.option.setAlertName(alertName);
+				this.setLabel(this.alertId + "( "+ (parseInt(monthOfFirst) < 10 ? '0'+monthOfFirst : monthOfFirst) + "/" + yearOfFirst + " )");
+			}else if( (monthOfFLast - monthOfFirst) > 3 ){
+				this.option.setTickSize(1, "month");
+				this.option.setAlertName(alertName);
+				this.setLabel(this.alertId + "( "+ yearOfFirst + " )");
+			}else{
+				this.option.setTickSize(7, "day");
+				this.option.setAlertName(alertName);
+				this.setLabel(this.alertId + "( "+ yearOfFirst + " )");
+			}
+		}else if( (yearOfLast - yearOfFirst) > 3){
+			this.option.setTickSize(1, "year");
+			this.option.setAlertName(alertName);
+			this.setLabel(this.alertId + "( "+ yearOfFirst + " - "+ yearOfLast + " )");
+		}else{
+			this.option.setTickSize(2, "month");
+			this.option.setAlertName(alertName);
+			this.setLabel(this.alertId + "( "+ yearOfFirst + " - "+ yearOfLast + " )");
+		}
+	};
+	
+	this.setLabel = function(label){
+		this.dataset[0].label = label;
+	};
 }
 
 // class Option for line chart 
 function Option(){
+	this.option = {};
 	
-	this.setTickSize = function(span , dateType){};
+	this.setTickSize = function(span , dateType){
+		this.option = this.getDefault();
+		this.option.xaxis.tickSize = [span, dateType];
+	};
+	this.setAlertName = function(alertName){
+		 this.option.xaxis.axisLabel = alertName;
+	};
 	this.setTimeFormat = function(){};
+	
+	this.getOption = function(){
+		console.log(this.option);
+		if(JSON.stringify(this.option) !== '{}') return this.option;
+		else return this.getDefault();	
+	};
 
 	this.getDefault = function(){
 		return{
@@ -130,14 +190,15 @@ function Option(){
 			},
 			xaxis :{
 				mode : 'time',
-				timeformat : '%m/%d/%y',
+				//timeformat : '%m/%d/%y',
 				tickSize : [ 3, 'month' ],
 				axisLabel :'alertName',
 				axisLabelUseCanvas : true,
 				axisLabelFontSizePixels : 12,
 				axisLabelFontFamily : 'Verdana, Arial',
-				axisLabelPadding : 10
+				axisLabelPadding : 10			
 			}, 
+			
 			series : {
 				lines : {
 					show : true,
@@ -152,7 +213,7 @@ function Option(){
 					steps : false
 				},
 				points : {
-					radius : 5,
+					radius : 1,
 					show : true
 				}
 			},

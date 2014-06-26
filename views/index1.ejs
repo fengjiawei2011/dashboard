@@ -17,7 +17,7 @@
 .chart{
 	margin-bottom: 40px;
 	margin-left : 0px;
-	width: 630px;
+	width: 50%;
 	height: 300px;
 }
 </style>
@@ -28,13 +28,17 @@ $(function(){
  	dashboard.initLineChartsArray(function(){
  		dashboard.drawLineCharts();
  	});	
+ 	
+ 	$('#filter button').click(function(){
+ 		var from = new Date($('from').val());
+		var to = new Date($('#to').val());	
+ 		dashboard.search(from, to);
+ 	});
 });
  	
 </script>
 </head>
 <body>
-	<div id="dashboard" style="margin-left: auto;margin-right: auto; width: 100%">
-
-	</div>
+	<div id="dashboard" style="margin-left: auto;margin-right: auto; width: 100%"></div>
 </body>
 </html>
