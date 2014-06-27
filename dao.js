@@ -2,9 +2,10 @@ var util = require('util');
 var mysql = require('mysql');;
 
 var connection = mysql.createConnection({
-	host     : 'localhost',
+	host     : '10.72.113.192',
+	port     : '7771',
 	user     : 'root',
-	password : '',
+	password : '123!@#qweQWE',
 	database : 'DFTAlert'
 });
 
@@ -34,7 +35,7 @@ exports.queryAlertDataByAlertIdV1 = function(alertId, callback){
 	var queryString = "SELECT * FROM ALERT_HISTORY a JOIN ALERT_MATEDATA b ON a.ALERT_ID=b.ALERT_ID WHERE a.ALERT_ID = '"+alertId+"' ORDER BY a.ALERT_TIME ASC";
 	connection.query(queryString, function(err, rows, fields) {
 	    if (err){
-	    	util.debug("queryAlertDataByAlertIdV1() ERROR!!! QUERY : [%s]", queryString);
+	    	util.debug("queryAlertDataByAlertIdV1() ERROR!!! QUERY : " + queryString);
 	    	throw err;
 	    }
 	    util.debug("queryAlertDataByAlertIdV1() successfully");
@@ -45,9 +46,10 @@ exports.queryAlertDataByAlertIdV1 = function(alertId, callback){
 
 exports.selectAlertIdV1 = function(callback){
 	var queryString = "SELECT distinct(ALERT_ID) FROM ALERT_HISTORY";
+	
 	connection.query(queryString, function(err,rows,fields){
 		if(err){
-			util.debug("selectAlertIdV1() ERROR!!! QUERY : [%s]", queryString);
+			util.debug("selectAlertIdV1() ERROR!!! QUERY : " + queryString);
 			throw err;	
 		}
 		util.debug("queryAlertDataByAlertIdV1() successfully");
