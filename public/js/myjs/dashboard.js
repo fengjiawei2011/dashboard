@@ -97,14 +97,24 @@ function Dashboard(datasets){ // datasets is an array
 		 
 		 $("body").append(html);
 	 };
+	 
 	 this.search = function(from , to, callback){
-		 $.blockUI(); 
-		 for(var i = 0 ; i < this.lineCharts.length; i++){
-			 var ds =  this.lineCharts[i].filterByDate( from , to );
-			 //console.log(JSON.stringify(ds));
-			 this.lineCharts[i].draw( ds );
-		 }
-		 callback();
+		if(from === '' && to === ''){
+			this.drawLineCharts();
+			 callback();
+			 return;
+		}else{
+			 for(var i = 0 ; i < this.lineCharts.length; i++){
+				 var ds =  this.lineCharts[i].filterByDate( from , to );
+				 //console.log(JSON.stringify(ds));
+				 this.lineCharts[i].draw( ds );
+			 }
+			 callback();
+		}
+	 };
+	 
+	 this.getUtil = function(){
+		 return this.myUtil;
 	 };
 }
 
@@ -184,8 +194,12 @@ function FlotLineChart(alertId, dataset, matedata){
 		var ds = this.dataset[0].data;
 		var newDS = [];
 		for(var i = 0; i < ds.length; i++){
-			if(ds[i][0] >= from && ds[i][0] <= to){
-				newDS.push(ds[i]);
+			if( from === '' && to !== ''){
+				if(ds[i][0] <= to) newDS.push(ds[i]);
+			}else if( from !== '' && to === ''){
+				if( ds[i][0] >= from ) newDS.push(ds[i]);	
+			}else{
+				if(ds[i][0] >= from && ds[i][0] <= to) newDS.push(ds[i]);	
 			}
 		}
 		return [{
@@ -277,7 +291,27 @@ function MyUtil(){
 			//hoverable: true
 		} ];
 	};
+	
+	this.isValidated = function( field ){
+		var flag = false;
+		switch( field ){
+			case 'search' : {
+				var from = $('#from').val();
+				var to = $('#to').val();
+				
+				if( from !== '' && to !== ''){
+					if(new Date(from) > new Date(to)){
+						alert('Please select correct time ( from <= to)');
+					}else{
+						flag = true;
+					}
+				}
+				break;
+			}	
+			default : ;
+		}
+		
+		return flag;
+	};
 }
 
-//var f = new FlotLineChart();
-//console.log(f.setOption());

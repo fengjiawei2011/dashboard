@@ -33,11 +33,13 @@ $(function(){
  	
  	$('#filter button').click(function(){
  		//$.unblockUI();
- 		var from = new Date($('#from').val()).getTime();
-		var to = new Date($('#to').val()).getTime();	
- 		dashboard.search(from, to, function(){
- 			//$.unblockUI();
- 		});
+ 		if(dashboard.getUtil().isValidated('search')){
+ 			var from = $('#from').val() !== '' ? new Date($('#from').val()).getTime() : '';
+ 			var to = $('#to').val() !== '' ? new Date($('#to').val()).getTime() : '';
+ 	 		dashboard.search(from, to, function(){
+ 	 			//$.unblockUI();
+ 	 		});
+ 		}
  	});
 });
  	
