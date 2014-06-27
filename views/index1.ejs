@@ -21,6 +21,10 @@
 	width: 50%;
 	height: 300px;
 }
+
+.popover {
+  max-width: 800px;
+}
 </style>
 <script type="text/javascript"> 
 $(function(){
@@ -28,7 +32,7 @@ $(function(){
 	dashboard.layout();
  	dashboard.initLineChartsArray(function(){
  		dashboard.drawLineCharts();
- 		$.unblockUI();
+ 		//$.unblockUI();
  	});	
  	
  	$('#filter button').click(function(){
@@ -41,6 +45,42 @@ $(function(){
  	 		});
  		}
  	});
+ 	
+ 	$('#monitor button').popover({
+ 	    trigger: 'hover',
+ 	    html: true,  // must have if HTML is contained in popover
+
+ 	    // get the title and conent
+ 	    title: function() {
+ 	    	return dashboard.getMatedata($(this).attr('alertId')).alertName;
+ 	    },
+ 	    content: function() {
+ 	    	var alertId = $(this).attr('alertId');
+ 	    	var matedata = dashboard.getMatedata(alertId);
+ 	    	var alertData = dashboard.getDatasets($(this).attr('alertId'));
+ 	    	var lastestAlertTime = alertData[alertData.length - 1].alertTime;
+ 			var mailList = matedata.mailList.split(",");
+ 	    	
+ 	    	var html = "lastestTime  : " + lastestAlertTime       + "<br/>";
+ 	    	html    += "Frequency    : " + matedata.frequency     + "<br/>";	
+ 	    	html    += "Threshold    : " + matedata.threshold     + "<br/>";
+ 	    	html    += "WarningStart : " + matedata.warningStart  + "<br/>";
+ 	    	html    += "WarningEnd   : " + matedata.warningEnd    + "<br/>";
+ 	    	html    += "AlertStart   : " + +matedata.alertStart   + "<br/>";
+ 	    	html    += "AlertEnd     : " + matedata.alertEnd      + "<br/>";
+ 	    	html    += "AlertFlag    : " + matedata.alertFlag     + "<br/>";
+ 	     	html    += "MailList     : " + mailList[0]            + "<br/>";
+ 	    	for(var i = 1; i < mailList.length ; i++){
+ 	    		html    += "             : " + mailList[i]            + "<br/>";
+ 	    	}
+ 	    	html    += "TaskType     : " + matedata.taskType      + "<br/>";
+ 	    	html    += "SQL          : " + matedata.sql           + "<br/>";
+ 	    	return html ;
+ 	    },
+ 	    container: 'body',
+ 	    placement: 'bottom'
+
+ 	  });
 });
  	
 </script>

@@ -41,9 +41,9 @@ function Dashboard(datasets){ // datasets is an array
 		 for(var i = 0 ; i < this.datasets.length; i++ ){
 			 html    += '<div  class="col-md-1" style="margin-bottom: 10px">';
 			 if(this.datasets[i].matedata.alertFlag === 'Y')
-				 html    += '<button  type="button" class="btn btn-success btn-block">';
+				 html    += '<button alertId='+this.datasets[i].alertId+' type="button" class="btn btn-success btn-block">';
 			 else 
-				 html    += '<button  type="button" class="btn btn-danger btn-block">';
+				 html    += '<button alertId='+this.datasets[i].alertId+' type="button" class="btn btn-danger btn-block">';
 			 html    += this.datasets[i].alertId;
 			 html    += '<br/>';
 			 html    += this.datasets[i].alertData[this.datasets[i].alertData.length-1].alertValue;
@@ -115,6 +115,20 @@ function Dashboard(datasets){ // datasets is an array
 	 
 	 this.getUtil = function(){
 		 return this.myUtil;
+	 };
+	 
+	 this.getMatedata = function(alertId){
+		 for(var i = 0; i < this.datasets.length; i++)
+			 if( this.datasets[i].alertId === alertId ) 
+				 return this.datasets[i].matedata;
+	 };
+	 
+	 this.getDatasets = function(alertId){
+		 for(var i = 0; i < this.datasets.length; i++){
+			 if(this.datasets[i].alertId === alertId)
+				 return this.datasets[i].alertData;
+		 }
+		
 	 };
 }
 
