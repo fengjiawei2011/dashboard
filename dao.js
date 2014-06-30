@@ -58,6 +58,12 @@ exports.selectAlertIdV1 = function(callback){
 }
 
 /*
+console.log(connection);
+this.selectAlertIdV1(function(r){
+	console.log(r);
+});
+*/
+/*
  * not good code
  * 
 exports.queryAlertDataByAlertId = function(alertId,callback){

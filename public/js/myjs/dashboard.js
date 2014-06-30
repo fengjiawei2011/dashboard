@@ -33,17 +33,29 @@ function Dashboard(datasets){ // datasets is an array
 		 this.drawDateFilter();
 		 this.drawChartsContainer();
 		 this.drawDialog();
-	 }
+	 };
 	 
 	 this.drawAlertsMonitor = function(){
 		 var html = "<div id='monitor' class='row'>";
 		 
 		 for(var i = 0 ; i < this.datasets.length; i++ ){
 			 html    += '<div  class="col-md-1" style="margin-bottom: 10px">';
-			 if(this.datasets[i].matedata.alertFlag === 'Y')
-				 html    += '<button alertId='+this.datasets[i].alertId+' type="button" class="btn btn-success btn-block">';
-			 else 
-				 html    += '<button alertId='+this.datasets[i].alertId+' type="button" class="btn btn-danger btn-block">';
+			 
+			 switch(this.getAlertStatus(this.datasets[i].alertId)){
+				 case 'green' :{
+					 html    += '<button alertId='+this.datasets[i].alertId+' type="button" class="btn btn-success btn-block">';
+					 break;
+				 }
+				 case 'yellow':{
+					 html    += '<button alertId='+this.datasets[i].alertId+' type="button" class="btn btn-warning btn-block">';
+					 break;
+				 }
+				 case 'red'   :{
+					 html    += '<button alertId='+this.datasets[i].alertId+' type="button" class="btn btn-danger btn-block">';
+					 break;
+				 }
+			 }
+			
 			 html    += this.datasets[i].alertId;
 			 html    += '<br/>';
 			 html    += this.datasets[i].alertData[this.datasets[i].alertData.length-1].alertValue;
@@ -113,8 +125,37 @@ function Dashboard(datasets){ // datasets is an array
 		}
 	 };
 	 
-	 this.getUtil = function(){
-		 return this.myUtil;
+	 /*
+	  *  'green'  means no alert 
+	  *  'yellow' means warning
+	  *  'red'    means alert
+	  */
+	 
+	 this.getAlertLastestData = function(alertId){
+		 var alertData = this.getDatasets(alertId);
+		 console.log(alertData);
+		 return  alertData[alertData.length - 1];
+	 };
+	 
+	 this.isTriggered = function(alertId , days){  // days means if alert is triggered within days 
+		// console.log(this.getAlertLastestData(alertId).alertTime);
+		 var time = new Date(this.getAlertLastestData(alertId).alertTime);
+		 if(new Date() > time.setDate(time.getDate() + days)) return false;
+		 else return true;
+	 };
+	 
+	 this.getAlertStatus = function(alertId){ 
+		 var matedata = this.getMatedata(alertId);
+		 var alertValue = this.getAlertLastestData(alertId).alertValue;
+		 if(!this.isTriggered(alertId, 33)){
+			 return "green";
+		 }else{
+			 if(alertValue >= matedata.warningStart && alertValue <= matedata.warningEnd)
+				 return "yellow";
+			 
+			 if(alertValue >= matedata.alertStart )
+				 return "red";
+		 }
 	 };
 	 
 	 this.getMatedata = function(alertId){
@@ -127,8 +168,11 @@ function Dashboard(datasets){ // datasets is an array
 		 for(var i = 0; i < this.datasets.length; i++){
 			 if(this.datasets[i].alertId === alertId)
 				 return this.datasets[i].alertData;
-		 }
-		
+		 }	
+	 };
+	 
+	 this.getUtil = function(){
+		 return this.myUtil;
 	 };
 }
 

@@ -46,9 +46,26 @@ var person = {
 	    }
 	};
 
+
+var isTriggered = function(days){
+	 var history = new Date("09/20/2013");
+	 var history1 = new Date("09/21/2013");
+	 var now = new Date();
+	 console.log(history < history1);
+	 history.setDate(history.getDate() + days);
+	 console.log(history < history1);
+	 console.log(now);
+	 console.log(history < now);
+	// console.log(history.toLocaleString());
+	 //console.log(history.toDateString());
+	// console.log(history.toLocaleString());
+	 //console.log(history.toLocaleTimeString());
+}
+
+isTriggered(3);
 	
-	console.log(JSON.stringify(person));
-	person.abc();
+//	console.log(JSON.stringify(person));
+//	person.abc();
 //JSONTest();
 //getDataByAlertId(ids.shift())
 //var d = new Date("2014/2/09");
