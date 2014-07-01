@@ -133,7 +133,7 @@ function Dashboard(datasets){ // datasets is an array
 	 
 	 this.getAlertLastestData = function(alertId){
 		 var alertData = this.getDatasets(alertId);
-		 console.log(alertData);
+		// console.log(alertData[alertData.length - 1]);
 		 return  alertData[alertData.length - 1];
 	 };
 	 

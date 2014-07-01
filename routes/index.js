@@ -2,18 +2,134 @@ var dao = require('../dao');
 
 var datasetArray = [];
 var alertIdArray = [];
-
+var timeStart;
+var timeEnd;
 
 exports.index = function(req, res){	
+	
+	timeStart = new Date().getMilliseconds();
+	//getDataAndPassToFronEnd(req , res);
+	//getDataAndPassToFronEndV1(req , res);
+	getDataAndPassToFronEndV2(req , res);
+	
+	console.log("finally done");	
+}
+
+
+//***************v2 start*********************************
+
+// parse2JSON(rows)
+function getDataAndPassToFronEndV2(req , res){
+	var datasetArrayV2 = [];
+	dao.queryAllAlertDataV2(function(rows){
+		for( var i = 0; i < rows.length; i++){
+			var obj = isObjExisted(rows[i].ALERT_ID, datasetArrayV2);
+			//console.log(obj);
+			if( obj ){
+				//console.log(JSON.stringify(obj));
+				obj.alertData.push(extractData(rows[i]));
+			}else{
+				var dataset  = {alertId : '', alertData : [] , matedata :{}};
+				dataset.alertId  = rows[i].ALERT_ID;
+				dataset.alertData.push(extractData(rows[i]));
+				dataset.matedata = getMatedata(rows[i]);
+				datasetArrayV2.push(dataset);
+			}	
+		}
+		//console.log(JSON.stringify(datasetArrayV2));
+		timeEnd = new Date().getMilliseconds();
+		console.log("method three take : " + (timeEnd - timeStart));
+		res.render('index1', { title: 'Express', datasets:JSON.stringify(datasetArrayV2)});
+	});
+}
+
+//isObjExisted(alertId, datasetArray)
+function isObjExisted(alertId, datasetArray){
+	for(var i = 0; i < datasetArray.length; i++){
+		if(alertId === datasetArray[i].alertId){
+			return datasetArray[i];
+		}	
+	}
+	return false;
+}
+
+//******************v2 end***********************************
+
+
+//*****************v1 start*******************************
+
+function getDataAndPassToFronEndV1(req , res){
+	
+	dao.selectAllAlertsMateData(function(rows){
+		for(var i = 0; i < rows.length; i++){
+			var jsonObj = {alertId : rows[i].ALERT_ID, alertData : [], matedata : getMatedata(rows[i])};
+			datasetArray.push(jsonObj);
+		}
+		console.log(rows);
+		
+		getAlertDataV1(res);
+	});
+}
+
+function getAlertDataV1(response){
+	var alerdata = [];
+	dao.queryAllAlertData(function(rows){
+		//console.log(rows);
+		//if(!rows) throw new Error("no data");
+		
+		for(var i = 0; i < rows.length; i++){
+			var obj = getObj(rows[i].ALERT_ID);
+			if( obj !== "notfound"){
+				obj.alertData.push(extractData(rows[i]));	
+			}		
+		}
+		
+		var d = datasetArray;
+		console.log(JSON.stringify(datasetArray));
+		cleanArray();
+		timeEnd = new Date().getMilliseconds();
+		console.log("method two take : " + (timeEnd - timeStart));
+		response.render('index1', { title: 'Express', datasets:JSON.stringify(d)});
+		
+	});
+}
+
+function getObj(alertId){
+	for(var i = 0; i < datasetArray.length; i++)
+		if(datasetArray[i].alertId === alertId) return datasetArray[i];
+	
+	return "notfound";
+}
+
+
+
+//***********************v1 end*********************************************
+
+function getDataAndPassToFronEnd(req , res){
 	dao.selectAlertIdV1(function(rows){
 		alertIdArray = getSortedAlertIdArray(rows);
 		var temp = alertIdArray.shift();
 		getAlertData(res , temp);	
 	});
-	console.log("finally done");	
 }
 
-// get raw data in DB sorted 
+function getAlertData(response, alertId){
+	if(alertId){
+		dao.queryAlertDataByAlertIdV1(alertId,function(rows){
+			var alertData = parse2JSON(alertId, rows);	
+			datasetArray.push(alertData);	
+			return getAlertData(response,alertIdArray.shift());
+		});
+	}else{
+		var d = datasetArray;
+		cleanArray();
+		timeEnd = new Date().getMilliseconds();
+		console.log("method one take : " + (timeEnd - timeStart));
+		response.render('index1', { title: 'Express', datasets:JSON.stringify(d)});
+	}
+}
+
+//get raw data sorted in DB  
 function getSortedAlertIdArray(dbRows){
 	var array = [];
 	for(var i in dbRows){
@@ -25,24 +141,12 @@ function getSortedAlertIdArray(dbRows){
 	return array;
 }
 
-
-function getAlertData(response, alertId){
-	if(alertId){
-		dao.queryAlertDataByAlertIdV1(alertId,function(rows){
-			var alertData = parse2JSON(alertId, rows);
-			//var convertedData = parse2FlotDatasetFormat(alertData);		
-			datasetArray.push(alertData);
-			//datasetArray = rows;
-			//datasetArray.push(rows);	
-			return getAlertData(response,alertIdArray.shift());
-		});
-		//return "inprocess";
-	}else{
-		console.log(datasetArray);
-		var d = datasetArray;
-		cleanArray();
-		response.render('index1', { title: 'Express', datasets:JSON.stringify(d)});
-	}
+function extractData(row){
+	var temp = {};
+	temp.alertTime  = row.ALERT_TIME;
+	temp.alertValue = row.ALERT_VALUE;
+	temp.alertType  = row.ALERT_TYPE;
+    return temp;
 }
 
 // get data from mysql , then parse them to JSON format data
@@ -50,18 +154,15 @@ function parse2JSON(alertId, dbRows){
 	var data = {alertId : alertId, alertData:[], matedata : {}};
 	data.matedata = getMatedata(dbRows[0]);
     for (var i in dbRows) {
-    	//delete dbRows[i].ID;
-    	//delete dbRows[i].ALERT_ID;
     	var temp = {};
     	temp.alertTime = dbRows[i].ALERT_TIME;
     	temp.alertValue = dbRows[i].ALERT_VALUE;
     	temp.alertType = dbRows[i].ALERT_TYPE;
     	data.alertData.push(temp);
-    	//data.matedata.sql = dbRows[i].QUERY_INFO;
-    	//data.matedata.alertName = dbRows[i].ALERT_NAME;
     }
     return data;
 }
+
 
 function cleanArray(){
 	datasetArray =[];
@@ -102,7 +203,6 @@ function sortByAlertId(alertIds){
 		alertIds[minIndex] = temp;
 	}
 }
-
 
 //parse alert id to INT which is used to sort
 function parse2Int(alertId){

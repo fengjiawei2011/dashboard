@@ -29,6 +29,7 @@
 <script type="text/javascript"> 
 $(function(){
 	var dashboard = new Dashboard(<%-datasets%>);
+	console.log(1);
 	dashboard.layout();
  	dashboard.initLineChartsArray(function(){
  		dashboard.drawLineCharts();

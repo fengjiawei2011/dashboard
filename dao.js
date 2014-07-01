@@ -31,6 +31,32 @@ exports.insertMateData = function(row){
 	});
 }
 
+
+exports.queryAllAlertDataV2 = function(callback){
+	//var queryString = "SELECT *  FROM ALERT_HISTORY ORDER BY ALERT_TIME";
+	var queryString = "SELECT *  FROM ALERT_HISTORY a JOIN ALERT_MATEDATA b ON a.ALERT_ID=b.ALERT_ID ORDER BY ALERT_TIME";
+	connection.query(queryString, function(err, rows, fields) {
+	    if (err){
+	    	util.debug("queryAllAlertDataV2() ERROR!!! QUERY : " + queryString);
+	    	throw err;
+	    }
+	    util.debug("queryAllAlertDataV2() successfully");
+	    callback(rows);
+	});	 
+}
+
+exports.queryAllAlertData = function(callback){
+	var queryString = "SELECT *  FROM ALERT_HISTORY ORDER BY ALERT_TIME";
+	connection.query(queryString, function(err, rows, fields) {
+	    if (err){
+	    	util.debug("queryAllAlertData() ERROR!!! QUERY : " + queryString);
+	    	throw err;
+	    }
+	    util.debug("queryAllAlertData() successfully");
+	    callback(rows);
+	});	 
+}
+
 exports.queryAlertDataByAlertIdV1 = function(alertId, callback){
 	var queryString = "SELECT * FROM ALERT_HISTORY a JOIN ALERT_MATEDATA b ON a.ALERT_ID=b.ALERT_ID WHERE a.ALERT_ID = '"+alertId+"' ORDER BY a.ALERT_TIME ASC";
 	connection.query(queryString, function(err, rows, fields) {
@@ -43,6 +69,18 @@ exports.queryAlertDataByAlertIdV1 = function(alertId, callback){
 	});	 
 }
 
+exports.selectAllAlertsMateData = function(callback){
+var queryString = "SELECT * FROM ALERT_MATEDATA";
+	
+	connection.query(queryString, function(err,rows,fields){
+		if(err){
+			util.debug("selectAllAlertsMateData() ERROR!!! QUERY : " + queryString);
+			throw err;	
+		}
+		util.debug("selectAllAlertsMateData() successfully");
+		callback(rows);
+	});
+}
 
 exports.selectAlertIdV1 = function(callback){
 	var queryString = "SELECT distinct(ALERT_ID) FROM ALERT_HISTORY";
