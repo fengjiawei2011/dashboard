@@ -61,12 +61,12 @@ function Dashboard(datasets){ // datasets is an array
 	     html    += '<span class="icon-bar"></span>';
 	     html    += '<span class="icon-bar"></span>';
 	     html    += '</button>';
-	     html    += '<img alt="" src="/img/logo.jpg">';
+	     html    += '<a class="navbar-brand text-center">Symantec DFT Dashboard</a>';
 	     html    += '</div>';
 	     html    += '<div class="collapse navbar-collapse">';
 	     html    += '<ul class="nav navbar-nav">';
-	     html    += '<li><a  href="#">DFT Alert Dashboard</a></li>';
-	     html    += '<li><a data-toggle="collapse" data-target="#monitor" href="#about">Monitor <span class="caret"></span></a></li>';
+	    // html    += '<li><a href="#"></a></li>';
+	     html    += '<li class="active"><a data-toggle="collapse" data-target="#monitor" href="#">Monitor <span class="caret"></span></a></li>';
 	     html    += '</ul>';
 	     html    += '</div></div></div>';
 	     
@@ -173,7 +173,7 @@ function Dashboard(datasets){ // datasets is an array
 		 var html = "<div id='filter' class='row'>";
 		 html    += "<div class='col-md-4'><span><input type='text' id='from' class='calendar form-control' placeholder='from'/></span></div>";
 		 html    += "<div class='col-md-4'><span><input type='text' id='to' class='calendar form-control' placeholder='to' /></span></div>";
-		 html    += "<div class='col-md-4'><button class='btn btn-default'>Search</button></div>";
+		 html    += "<div class='col-md-4'><button class='btn btn-default'>Go</button></div>";
 		 html    += "</div>";
 		 
 		 $("#dashboard").append(html);

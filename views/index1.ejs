@@ -14,7 +14,10 @@
 <script type="text/javascript" src="/js/myjs/dashboard.js"></script>
 <script type="text/javascript" src="/js/jquery.blockUI.js"></script>
 <style type="text/css">
-
+.navbar-brand1 {
+font-size: large;
+font-weight:bold;
+}
 #monitor {
 position:relative;
 border-right: 1px #f8f7f3 solid;
@@ -83,9 +86,19 @@ $(function(){
  			var from = $('#from').val() !== '' ? new Date($('#from').val()).getTime() : '';
  			var to = $('#to').val() !== '' ? new Date($('#to').val()).getTime() : '';
  	 		dashboard.search(from, to);
- 	 		$(this).html('go');
+ 	 		$(this).html('Go');
  		}
  	});
+ 	
+ 	$('.navbar-nav li').click(function(){
+ 		var monitor= $(this).attr('class');
+ 		if(monitor === 'active'){
+ 			$(this).removeClass('active');
+ 		}else{
+ 			$(this).addClass('active');
+ 		}
+ 	});
+ 	
  	
  	$('#monitor a').popover({
  	    trigger: 'hover',
