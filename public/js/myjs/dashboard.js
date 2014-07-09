@@ -27,6 +27,8 @@ function Dashboard(datasets){ // datasets is an array
 	 
 	 // layout the whole dashboard GUI
 	 this.layout = function(){
+		 this.drawNavBar();
+		 this.drawDashboardDiv();
 		 this.drawBackToTopButton();
 		 this.drawAlertsMonitor();
 		 this.drawDateFilter();
@@ -34,16 +36,45 @@ function Dashboard(datasets){ // datasets is an array
 		 this.drawDialog();
 	 };
 	 
+	 
+	 this.drawDashboardDiv = function(){
+		 var html = '<div id="dashboard" style="margin-left: auto;margin-right: auto; width: 1280px"></div>';
+		 $('body').append(html);
+	 };
+	 
 	 this.drawBackToTopButton = function(){
-		 var html = '<div style="position:fixed;right:10px;top:40%;"><a href="#top" type="button" class="btn btn-primary btn-block">Back To Top</a></div>'; 
-		 var htmlTop = '<div id = "top"></div>';
-			 
-		 $('body').prepend(htmlTop);
+		 var html = '<div style="position:fixed;right:10px;top:40%;"><a href="#nav-bar" type="button" class="btn btn-primary btn-block">Back To Top</a></div>'; 
 		 $('body').append(html);	 	
 	 }
 	 
+	 this.enlargeChart = function(){
+		 
+	 };
+	 
+	 this.drawNavBar = function(){
+		 var html = '<div id="nav-bar" class="navbar navbar-inverse navbar-fixed-top" role="navigation">';
+	     html    += '<div class="container">';
+	     html    += '<div class="navbar-header">';
+	     html    += '<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">';
+	     html    += '<span class="sr-only">Toggle navigation</span>';
+	     html    += '<span class="icon-bar"></span>';
+	     html    += '<span class="icon-bar"></span>';
+	     html    += '<span class="icon-bar"></span>';
+	     html    += '</button>';
+	     html    += '<img alt="" src="/img/logo.jpg">';
+	     html    += '</div>';
+	     html    += '<div class="collapse navbar-collapse">';
+	     html    += '<ul class="nav navbar-nav">';
+	     html    += '<li><a  href="#">DFT Alert Dashboard</a></li>';
+	     html    += '<li><a data-toggle="collapse" data-target="#monitor" href="#about">Monitor <span class="caret"></span></a></li>';
+	     html    += '</ul>';
+	     html    += '</div></div></div>';
+	     
+	     $('body').prepend(html);         
+	 };
+	 
 	 this.drawAlertsMonitor = function(){
-		 var html = "<div id='monitor' class='row'>";
+		 var html = "<div id='monitor' class='row collapse in'>";
 		 
 		 for(var i = 0 ; i < this.datasets.length; i++ ){
 			 html    += '<div  class="col-md-1" style="margin-bottom: 10px">';
@@ -75,10 +106,10 @@ function Dashboard(datasets){ // datasets is an array
 	 };
 	 
 	 this.drawDateFilter = function(){
-		 var html = "<div id='filter' style='margin-left: auto;margin-right: auto; margin-bottom:30px; width: 80%'>";
-		 html    += "<span>From : <input type='text' id='from' class='calendar' /></span>";
-		 html    += "<span>To   :<input type='text' id='to' class='calendar' /></span>";
-		 html    += "<button>go</button>";
+		 var html = "<div id='filter' class='row'>";
+		 html    += "<div class='col-md-4'><span><input type='text' id='from' class='calendar form-control' placeholder='from'/></span></div>";
+		 html    += "<div class='col-md-4'><span><input type='text' id='to' class='calendar form-control' placeholder='to' /></span></div>";
+		 html    += "<div class='col-md-4'><button class='btn btn-default'>Search</button></div>";
 		 html    += "</div>";
 		 
 		 $("#dashboard").append(html);
@@ -210,12 +241,12 @@ function FlotLineChart(alertId, dataset, matedata){
 		//console.log(JSON.stringify(dataset));
 		if($("#"+this.alertId).html() == '' || $("#"+this.alertId).html() == null ){
 			var html = "<div class='col-md-6 model-shadow' >";
-			html    += "<div class='chart-title'>";
+			html    += "<div class='chart-title'  data-toggle='modal' data-target='#myModal'>";
 			html    += matedata.alertName;
 			html    += "</div>";
 			html    += "<div class='chart' id='";
 			html    += this.alertId;
-			html    += "' data-toggle='modal' data-target='#myModal1'>";	
+			html    += "'>";	
 			html    += "</div></div>"
 			$('#chartsContainer').append(html);
 		}	
