@@ -30,7 +30,7 @@ function Dashboard(datasets){ // datasets is an array
 		 this.drawNavBar();
 		 this.drawDashboardDiv();
 		 this.drawBackToTopButton();
-		 this.drawAlertsMonitor();
+		 this.drawAlertsMonitorV2();
 		 this.drawDateFilter();
 		 this.drawChartsContainer();
 		 this.drawDialog();
@@ -103,6 +103,70 @@ function Dashboard(datasets){ // datasets is an array
 		 html    += '</div>';
 		 
 		 $("#dashboard").append(html);
+	 };
+	 
+	 
+	 // this function improve the old version that show alert monitor randomly
+	 // but this can show alert monitors by alert type( alert, warning, no alert)
+	 this.drawAlertsMonitorV2 = function(){
+		 var html = "<div id='monitor'   class='row collapse in'>";
+		 
+		 html    += "<div  id='alert-red' class='col-md-4 alert-block'>";
+		 html    += "</div>";
+		  	 
+		 html    += "<div  id='alert-yellow' class='col-md-4 alert-block'>";
+		 html    += "</div>";
+		 	 
+	 	 html    += "<div  id='alert-green' class='col-md-4 alert-block'>";
+	 	 html    += "</div>";
+		 	 
+		 html    += '</div>';
+		 	 
+		 $("#dashboard").append(html);
+		 
+		 for(var i = 0 ; i < this.datasets.length; i++ ){
+			 var html    = '<div  class="col-md-3" style="margin-bottom: 10px">';
+			 var flag = '';
+			 switch(this.getAlertStatus(this.datasets[i].alertId)){
+				 case 'green' :{
+					 html += '<a href=#'+ this.datasets[i].alertId +' alertId='+this.datasets[i].alertId+' type="button" class="btn btn-success btn-block">';
+					 flag  = 'green';
+					 break;
+				 }
+				 case 'yellow':{
+					 html += '<a href=#'+ this.datasets[i].alertId +' alertId='+this.datasets[i].alertId+' type="button" class="btn btn-warning btn-block">';
+					 flag  = 'yellow';
+					 break;
+				 }
+				 case 'red'   :{
+					 html += '<a href=#'+ this.datasets[i].alertId +' alertId='+this.datasets[i].alertId+' type="button" class="btn btn-danger btn-block">';
+					 flag  = 'red';
+					 break;
+				 }
+			 }
+			
+			 html    += this.datasets[i].alertId;
+			 html    += '<br/>';
+			 html    += this.datasets[i].alertData[this.datasets[i].alertData.length-1].alertValue;
+			 html    += '</a></div>';
+			 
+			 switch(flag){
+				 case 'green' :{
+					 $('#alert-green').append(html);
+					 break;
+				 }
+				 case 'yellow':{
+					 $('#alert-yellow').append(html);
+					 break;
+				 }
+				 case 'red'   :{
+					 $('#alert-red').append(html);
+					 break;
+				 }
+			 }
+			 
+		 } 	 
+		
 	 };
 	 
 	 this.drawDateFilter = function(){
