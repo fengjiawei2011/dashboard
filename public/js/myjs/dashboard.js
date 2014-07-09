@@ -21,19 +21,26 @@ function Dashboard(datasets){ // datasets is an array
 	 this.drawLineCharts = function(){ 
 		 for(var i = 0; i < this.lineCharts.length; i++){
 			var dataset = this.lineCharts[i].getDataset();
-			//var from = dataset[0].data[0][0];
-			//var to = dataset[0].data[dataset[0].data.length-1][0];
 			this.lineCharts[i].draw( dataset );
 		 }
 	 }; 
 	 
 	 // layout the whole dashboard GUI
 	 this.layout = function(){
+		 this.drawBackToTopButton();
 		 this.drawAlertsMonitor();
 		 this.drawDateFilter();
 		 this.drawChartsContainer();
 		 this.drawDialog();
 	 };
+	 
+	 this.drawBackToTopButton = function(){
+		 var html = '<div style="position:fixed;right:10px;top:40%;"><a href="#top" type="button" class="btn btn-primary btn-block">Back To Top</a></div>'; 
+		 var htmlTop = '<div id = "top"></div>';
+			 
+		 $('body').prepend(htmlTop);
+		 $('body').append(html);	 	
+	 }
 	 
 	 this.drawAlertsMonitor = function(){
 		 var html = "<div id='monitor' class='row'>";
@@ -43,15 +50,15 @@ function Dashboard(datasets){ // datasets is an array
 			 
 			 switch(this.getAlertStatus(this.datasets[i].alertId)){
 				 case 'green' :{
-					 html    += '<button alertId='+this.datasets[i].alertId+' type="button" class="btn btn-success btn-block">';
+					 html    += '<a href=#'+ this.datasets[i].alertId +' alertId='+this.datasets[i].alertId+' type="button" class="btn btn-success btn-block">';
 					 break;
 				 }
 				 case 'yellow':{
-					 html    += '<button alertId='+this.datasets[i].alertId+' type="button" class="btn btn-warning btn-block">';
+					 html    += '<a href=#'+ this.datasets[i].alertId +' alertId='+this.datasets[i].alertId+' type="button" class="btn btn-warning btn-block">';
 					 break;
 				 }
 				 case 'red'   :{
-					 html    += '<button alertId='+this.datasets[i].alertId+' type="button" class="btn btn-danger btn-block">';
+					 html    += '<a href=#'+ this.datasets[i].alertId +' alertId='+this.datasets[i].alertId+' type="button" class="btn btn-danger btn-block">';
 					 break;
 				 }
 			 }
@@ -59,7 +66,7 @@ function Dashboard(datasets){ // datasets is an array
 			 html    += this.datasets[i].alertId;
 			 html    += '<br/>';
 			 html    += this.datasets[i].alertData[this.datasets[i].alertData.length-1].alertValue;
-			 html    += '</button></div>';
+			 html    += '</a></div>';
 		 } 
 	
 		 html    += '</div>';
@@ -110,7 +117,7 @@ function Dashboard(datasets){ // datasets is an array
 		 $("body").append(html);
 	 };
 	 
-	 this.search = function(from , to, callback){
+	 this.search = function(from , to){
 		if(from === '' && to === ''){
 			this.drawLineCharts();
 			 callback();
@@ -121,7 +128,7 @@ function Dashboard(datasets){ // datasets is an array
 				 //console.log(JSON.stringify(ds));
 				 this.lineCharts[i].draw( ds );
 			 }
-			 callback();
+			// callback("success");
 		}
 	 };
 	 
@@ -174,6 +181,21 @@ function Dashboard(datasets){ // datasets is an array
 	 this.getUtil = function(){
 		 return this.myUtil;
 	 };
+	 this.block = function(){
+		 console.log("block");
+		 $.blockUI({ css: { 
+	            border: 'none', 
+	            padding: '15px', 
+	            backgroundColor: '#000', 
+	            '-webkit-border-radius': '10px', 
+	            '-moz-border-radius': '10px', 
+	            opacity: .5, 
+	            color: '#fff' 
+	        } }); 
+	 };
+	 this.unblock = function(){
+		 $.unblockUI();
+	 };
 }
 
 // class FlotLineChart
@@ -187,9 +209,14 @@ function FlotLineChart(alertId, dataset, matedata){
 	this.draw = function( dataset ){	
 		//console.log(JSON.stringify(dataset));
 		if($("#"+this.alertId).html() == '' || $("#"+this.alertId).html() == null ){
-			var html = "<div class='col-md-6 chart' id='";
+			var html = "<div class='col-md-6 model-shadow' >";
+			html    += "<div class='chart-title'>";
+			html    += matedata.alertName;
+			html    += "</div>";
+			html    += "<div class='chart' id='";
 			html    += this.alertId;
-			html    += "' data-toggle='modal' data-target='#myModal1'></div>";		
+			html    += "' data-toggle='modal' data-target='#myModal1'>";	
+			html    += "</div></div>"
 			$('#chartsContainer').append(html);
 		}	
 		this.improveDateAppranceOnXaxis( dataset );
@@ -219,28 +246,28 @@ function FlotLineChart(alertId, dataset, matedata){
 		if(yearOfFirst === yearOfLast){
 			if(monthOfFirst === monthOfFLast){
 				this.option.setTickSize(1, "day");
-				this.option.setAlertName(alertName);
+				//this.option.setAxisLabel(alertName);
 				//this.setLabel(this.alertId + "( "+ (parseInt(monthOfFirst) < 10 ? '0'+monthOfFirst : monthOfFirst) + "/" + yearOfFirst + " )");
 				dataset[0].label = this.alertId + "( "+ (parseInt(monthOfFirst) < 10 ? '0'+monthOfFirst : monthOfFirst) + "/" + yearOfFirst + " )";
 			}else if( (monthOfFLast - monthOfFirst) > 3 ){
 				this.option.setTickSize(1, "month");
-				this.option.setAlertName(alertName);
+				//this.option.setAxisLabel(alertName);
 				//this.setLabel(this.alertId + "( "+ yearOfFirst + " )");
 				dataset[0].label = this.alertId + "( "+ yearOfFirst + " )";
 			}else{
 				this.option.setTickSize(7, "day");
-				this.option.setAlertName(alertName);
+				//this.option.setAxisLabel(alertName);
 				//this.setLabel(this.alertId + "( "+ yearOfFirst + " )");
 				dataset[0].label = this.alertId + "( "+ yearOfFirst + " )";
 			}
 		}else if( (yearOfLast - yearOfFirst) > 3){
 			this.option.setTickSize(1, "year");
-			this.option.setAlertName(alertName);
+			//this.option.setAxisLabel(alertName);
 			//this.setLabel(this.alertId + "( "+ yearOfFirst + " - "+ yearOfLast + " )");
 			dataset[0].label = this.alertId + "( "+ yearOfFirst + " - "+ yearOfLast + " )";
 		}else{
 			this.option.setTickSize(2, "month");
-			this.option.setAlertName(alertName);
+			//this.option.setAxisLabel(alertName);
 			//this.setLabel(this.alertId + "( "+ yearOfFirst + " - "+ yearOfLast + " )");
 			dataset[0].label = this.alertId + "( "+ yearOfFirst + " - "+ yearOfLast + " )";
 		}
@@ -278,8 +305,8 @@ function Option(){
 		this.option = this.getDefault();
 		this.option.xaxis.tickSize = [span, dateType];
 	};
-	this.setAlertName = function(alertName){
-		 this.option.xaxis.axisLabel = alertName;
+	this.setAxisLabel = function(str){
+		 this.option.xaxis.axisLabel = axisLabel;
 	};
 	this.setTimeFormat = function(){};
 	
@@ -298,7 +325,7 @@ function Option(){
 				mode : 'time',
 				//timeformat : '%m/%d/%y',
 				tickSize : [ 3, 'month' ],
-				axisLabel :'alertName',
+				axisLabel :'',
 				axisLabelUseCanvas : true,
 				axisLabelFontSizePixels : 12,
 				axisLabelFontFamily : 'Verdana, Arial',
@@ -363,6 +390,8 @@ function MyUtil(){
 					}else{
 						flag = true;
 					}
+				}else{
+					alert("date cann't be empty!");
 				}
 				break;
 			}	
