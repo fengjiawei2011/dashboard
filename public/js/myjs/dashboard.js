@@ -38,7 +38,7 @@ function Dashboard(datasets){ // datasets is an array
 	 
 	 
 	 this.drawDashboardDiv = function(){
-		 var html = '<div id="dashboard" style="margin-left: auto;margin-right: auto; width: 1280px"></div>';
+		 var html = '<div id="dashboard" style="margin-left: auto;margin-right: auto; width: 95%"></div>';
 		 $('body').append(html);
 	 };
 	 
