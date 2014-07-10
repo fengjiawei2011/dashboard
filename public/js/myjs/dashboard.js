@@ -129,17 +129,17 @@ function Dashboard(datasets){ // datasets is an array
 			 var flag = '';
 			 switch(this.getAlertStatus(this.datasets[i].alertId)){
 				 case 'green' :{
-					 html += '<a href=#'+ this.datasets[i].alertId +' alertId='+this.datasets[i].alertId+' type="button" class="btn btn-success btn-block">';
+					 html += '<a href=#'+ this.datasets[i].alertId +'-title alertId='+this.datasets[i].alertId+' type="button" class="btn btn-success btn-block">';
 					 flag  = 'green';
 					 break;
 				 }
 				 case 'yellow':{
-					 html += '<a href=#'+ this.datasets[i].alertId +' alertId='+this.datasets[i].alertId+' type="button" class="btn btn-warning btn-block">';
+					 html += '<a href=#'+ this.datasets[i].alertId +'-title alertId='+this.datasets[i].alertId+' type="button" class="btn btn-warning btn-block">';
 					 flag  = 'yellow';
 					 break;
 				 }
 				 case 'red'   :{
-					 html += '<a href=#'+ this.datasets[i].alertId +' alertId='+this.datasets[i].alertId+' type="button" class="btn btn-danger btn-block">';
+					 html += '<a href=#'+ this.datasets[i].alertId +'-title alertId='+this.datasets[i].alertId+' type="button" class="btn btn-danger btn-block">';
 					 flag  = 'red';
 					 break;
 				 }
@@ -240,16 +240,16 @@ function Dashboard(datasets){ // datasets is an array
 	 };
 	 
 	 this.isTriggered = function(alertId , days){  // days means if alert is triggered within days 
-		// console.log(this.getAlertLastestData(alertId).alertTime);
-		 var time = new Date(this.getAlertLastestData(alertId).alertTime);
-		 if(new Date() > time.setDate(time.getDate() + days)) return false;
+		 var time = new Date( this.getAlertLastestData(alertId).alertTime);
+		 time.setDate(time.getDate() + days);
+		 if(new Date() > time )  return false;
 		 else return true;
 	 };
 	 
 	 this.getAlertStatus = function(alertId){ 
 		 var matedata = this.getMatedata(alertId);
 		 var alertValue = this.getAlertLastestData(alertId).alertValue;
-		 if(!this.isTriggered(alertId, 33)){
+		 if(!this.isTriggered(alertId, 3)){
 			 return "green";
 		 }else{
 			 if(alertValue >= matedata.warningStart && alertValue <= matedata.warningEnd)
@@ -305,7 +305,7 @@ function FlotLineChart(alertId, dataset, matedata){
 		//console.log(JSON.stringify(dataset));
 		if($("#"+this.alertId).html() == '' || $("#"+this.alertId).html() == null ){
 			var html = "<div class='col-md-6 model-shadow' >";
-			html    += "<div class='chart-title'  data-toggle='modal' data-target='#myModal'>";
+			html    += "<div id='"+this.alertId+"-title' class='chart-title'  data-toggle='modal' data-target='#myModal'>";
 			html    += matedata.alertName;
 			html    += "</div>";
 			html    += "<div class='chart' id='";

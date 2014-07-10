@@ -3,9 +3,11 @@ var mysql = require('mysql');;
 
 var connection = mysql.createConnection({
 	host     : '10.72.113.192',
+	//host : 'localhost',
 	port     : '7771',
 	user     : 'root',
 	password : '123!@#qweQWE',
+	//password : '',
 	database : 'DFTAlert'
 });
 
