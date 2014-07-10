@@ -111,14 +111,26 @@ function Dashboard(datasets){ // datasets is an array
 	 this.drawAlertsMonitorV2 = function(){
 		 var html = "<div id='monitor'   class='row collapse in'>";
 		 
-		 html    += "<div  id='alert-red' class='col-md-4 alert-block'>";
+		 html    += "<div class='col-md-4'>";
+		 html    += "<div class= 'alert-block'>"
+		 html    += "<div class='monitor-title alert-red-title'>Alert</div>";
+		 html    += "<div  id='alert-red' class='alert-content'></div>";
 		 html    += "</div>";
-		  	 
-		 html    += "<div  id='alert-yellow' class='col-md-4 alert-block'>";
 		 html    += "</div>";
-		 	 
-	 	 html    += "<div  id='alert-green' class='col-md-4 alert-block'>";
-	 	 html    += "</div>";
+		 
+		 html    += "<div class='col-md-4'>";
+		 html    += "<div class= 'alert-block'>"
+		 html    += "<div class='monitor-title alert-yellow-title'>Warning</div>";
+		 html    += "<div  id='alert-yellow' class='alert-content'></div>";
+		 html    += "</div>";
+		 html    += "</div>";
+		 
+		 html    += "<div class='col-md-4'>";
+		 html    += "<div class= 'alert-block'>"
+		 html    += "<div class='monitor-title alert-green-title'>Congratulation</div>";
+		 html    += "<div  id='alert-green' class='alert-content'></div>";
+		 html    += "</div>";
+		 html    += "</div>";
 		 	 
 		 html    += '</div>';
 		 	 
@@ -167,12 +179,15 @@ function Dashboard(datasets){ // datasets is an array
 			 
 		 } 	 
 		
+		 $.each($('.alert-content'), function(index, value){
+			 if($(value).html() === '') $(value).html('<div class="no-result"><span>Alerts are less than threshold or not triggerred. </span></div>');
+		 });
 	 };
 	 
 	 this.drawDateFilter = function(){
 		 var html = "<div id='filter' class='row'>";
-		 html    += "<div class='col-md-4'><span><input type='text' id='from' class='calendar form-control' placeholder='from'/></span></div>";
-		 html    += "<div class='col-md-4'><span><input type='text' id='to' class='calendar form-control' placeholder='to' /></span></div>";
+		 html    += "<div class='col-md-4'><span><input type='text' id='from' class='calendar form-control' placeholder='From'/></span></div>";
+		 html    += "<div class='col-md-4'><span><input type='text' id='to' class='calendar form-control' placeholder='To' /></span></div>";
 		 html    += "<div class='col-md-4'><button class='btn btn-default'>Go</button></div>";
 		 html    += "</div>";
 		 

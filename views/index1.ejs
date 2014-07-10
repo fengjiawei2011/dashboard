@@ -14,22 +14,13 @@
 <script type="text/javascript" src="/js/myjs/dashboard.js"></script>
 <script type="text/javascript" src="/js/jquery.blockUI.js"></script>
 <style type="text/css">
-.navbar-brand1 {
+
+.navbar-brand {
 font-size: large;
 font-weight:bold;
 }
-#monitor {
-position:relative;
-border-right: 1px #f8f7f3 solid;
-}
 
-.alert-block {
-height:250px;		
-overflow-y:auto;
-position:relative;
-margin-left:-5px;
-}
-
+/* chart style */
 
 .chart{
 	margin-bottom: 20px;
@@ -52,16 +43,65 @@ border-color: #e5e5e5 #eee #eee;
 border-style: solid;
 border-width: 1px 1px;
 -webkit-box-shadow: inset 0 3px 6px rgba(0,0,0,.05);
-box-shadow:  0px 1px 1px 1px rgba(0,0,0,.3);
+box-shadow:  0px 1px 1px 1px rgba(0,0,0,.3); 
+/* -webkit-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+-moz-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75); */
+}
+
+/* Monitor style*/
+
+#monitor {
+position:relative;
+border-right: 1px #f8f7f3 solid;
+margin-top:20px;
+margin-bottom: 20px;
+}
+
+.alert-block {
+
+-webkit-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+-moz-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+}
+
+.alert-content {
+height:250px;		
+overflow-y:auto;
+position:relative;
+margin: 10px 2px 20px;
 }
 
 .popover {
   max-width: 800px;
 } 
 
-#monitor {
-margin-top:10px;
+.monitor-title {
+text-align: center;
+padding: 10px;
+font-size: large;
+margin-bottom: 10px;
 }
+
+.alert-red-title {
+background-color: #F78181;
+}
+
+.alert-yellow-title {
+background-color: #F7D358;
+}
+
+.alert-green-title {
+background-color: #81F781;
+}
+
+.no-result {
+text-align: center;
+font-size: x-large;
+margin-top: 40px;
+}
+
+/* Filter style*/
 
 #filter {
 margin-top:20px;
