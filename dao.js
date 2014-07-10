@@ -2,14 +2,18 @@ var util = require('util');
 var mysql = require('mysql');;
 
 var connection = mysql.createConnection({
-	//host     : '10.72.113.192',
-	host : 'localhost',
-	//port     : '7771',
+	// server connection
+	host     : '10.72.113.192',
+	port     : '7771',
 	user     : 'root',
-	//password : '123!@#qweQWE',
-	password : '',
-	//database : 'DFTAlert'
-	database   : 'alert'
+	password : '123!@#qweQWE',
+	database : 'DFTAlert'
+	
+    // local connection
+//	host     : 'localhost',
+//	user     : 'root',
+//	password : '',
+//	database : 'alert'
 });
 
 exports.insertAllDataFromCSV = function(alertId, aLertTime, alertValue, alertType){	
