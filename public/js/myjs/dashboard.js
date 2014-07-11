@@ -38,7 +38,7 @@ function Dashboard(datasets){ // datasets is an array
 	 
 	 
 	 this.drawDashboardDiv = function(){
-		 var html = '<div id="dashboard" style="margin-left: auto;margin-right: auto; width: 95%"></div>';
+		 var html = '<div id="dashboard" style="margin-left: auto;margin-right: auto; width: 100%"></div>';
 		 $('body').append(html);
 	 };
 	 
@@ -137,11 +137,11 @@ function Dashboard(datasets){ // datasets is an array
 		 $("#dashboard").append(html);
 		 
 		 for(var i = 0 ; i < this.datasets.length; i++ ){
-			 var html    = '<div  class="col-md-2" style="margin-bottom: 10px; width : 14.2%">';
+			 var html    = '<div  class="col-md-2" style="margin-bottom: 10px;">';
 			 var flag = '';
 			 switch(this.getAlertStatus(this.datasets[i].alertId)){
 				 case 'green' :{
-					 html += '<a href=#'+ this.datasets[i].alertId +'-title alertId='+this.datasets[i].alertId+' type="button" class="btn btn-success btn-block">';
+					 html += '<a href=#'+ this.datasets[i].alertId +'-title alertId='+this.datasets[i].alertId+' type="button" class="btn btn-success btn-block  ">';
 					 flag  = 'green';
 					 break;
 				 }
