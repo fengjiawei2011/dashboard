@@ -158,14 +158,16 @@ $(function(){
  	    	var matedata = dashboard.getMatedata(alertId);
  	    	var alertData = dashboard.getDatasets($(this).attr('alertId'));
  	    	var lastestAlertTime = alertData[alertData.length - 1].alertTime;
+ 	    	var alertValue = alertData[alertData.length - 1].alertValue;
  			var mailList = matedata.mailList.split(",");
  	    	
  	    	var html = "lastestTime  : " + lastestAlertTime       + "<br/>";
+ 	    	html    += "alertValue   : " + alertValue             + "<br/>";   
  	    	html    += "Frequency    : " + matedata.frequency     + "<br/>";	
  	    	html    += "Threshold    : " + matedata.threshold     + "<br/>";
  	    	html    += "WarningStart : " + matedata.warningStart  + "<br/>";
  	    	html    += "WarningEnd   : " + matedata.warningEnd    + "<br/>";
- 	    	html    += "AlertStart   : " + matedata.alertStart   + "<br/>";
+ 	    	html    += "AlertStart   : " + matedata.alertStart    + "<br/>";
  	    	html    += "AlertEnd     : " + matedata.alertEnd      + "<br/>";
  	    	html    += "AlertFlag    : " + matedata.alertFlag     + "<br/>";
  	     	html    += "MailList     : " + mailList[0]            + "<br/>";

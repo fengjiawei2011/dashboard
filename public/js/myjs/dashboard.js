@@ -137,7 +137,7 @@ function Dashboard(datasets){ // datasets is an array
 		 $("#dashboard").append(html);
 		 
 		 for(var i = 0 ; i < this.datasets.length; i++ ){
-			 var html    = '<div  class="col-md-3" style="margin-bottom: 10px">';
+			 var html    = '<div  class="col-md-2" style="margin-bottom: 10px; width : 14.2%">';
 			 var flag = '';
 			 switch(this.getAlertStatus(this.datasets[i].alertId)){
 				 case 'green' :{
@@ -158,8 +158,8 @@ function Dashboard(datasets){ // datasets is an array
 			 }
 			
 			 html    += this.datasets[i].alertId;
-			 html    += '<br/>';
-			 html    += this.datasets[i].alertData[this.datasets[i].alertData.length-1].alertValue;
+			// html    += '<br/>';
+			// html    += this.datasets[i].alertData[this.datasets[i].alertData.length-1].alertValue;
 			 html    += '</a></div>';
 			 
 			 switch(flag){

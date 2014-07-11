@@ -19,26 +19,7 @@ function insertIntoAlertHistory(){
 		var data = line.split(',');
 		console.log(data[6]);
 		if (parseInt(data[2]) >= 0 && data[0].toLowerCase().indexOf("test") == -1) {
-			// dao.insertAllDataFromCSV(data[0],data[1],data[2],data[3]);
-			if(!isExist(data[0])){
-				matedata.push(data[09]);
-				var row = {
-						ALERT_ID       : data[0],
-						ALERT_NAME     : data[5],
-						QUERY_INFO     : data[6],
-						FREQUENCY      : data[7],
-						THRESHOLD_VALUE: data[8],
-						WARNING_START  : data[11],
-						WARNING_END    : data[12],
-						ALERT_START    : data[13],
-						ALERT_END      : data[14] > 999999 ? 999999: data[14],
-						ALERT_FLAG     : data[9],
-						MAIL_LIST      : data[10],
-						TASK_TYPE      : data[17]
-				};
-				console.log(line);
-				//dao.insertMateData(row);
-			}
+			dao.insertAllDataFromCSV(data[0],data[1],data[2],data[3]);
 		}
 	});
 }
@@ -54,10 +35,10 @@ function isExist(data){
 //insertIntoAlertHistory();
 
 /*read data from .xls*/
-function insertIntoMateData(){
+function uploadData(){
 	var basePath = '~/Desktop/';
 	//var inputFile = basePath + "mntr_alert_meta_data_codsp.xls";
-	var inputFile = basePath + "alert_matedata.xlsx";
+	var inputFile = basePath + "alert_data_20140710-1440.xlsx";
 	var spreadsheet=require('node_spreadsheet');
 	
 	spreadsheet.read(inputFile, function(err, data) {
@@ -67,6 +48,18 @@ function insertIntoMateData(){
 			
 			/* insert matedata from .xlsx to mysql*/
 			if(data[i][0] === "ALERT_ID" || data[i][0] ==="") continue;
+			
+			if (parseInt(data[i][2]) >= 0 && data[i][0].toLowerCase().indexOf("test") == -1) {
+				var row = {
+						ALERT_ID:data[i][0], 
+						ALERT_TIME:new Date(data[i][1]), 
+						ALERT_VALUE:data[i][2], 
+						ALERT_TYPE:data[i][3]
+					};
+				console.log(row);
+				dao.insertLastestData(row);
+			}
+			
 			if(!isExist(data[i][0])){
 				matedata.push(data[i][0]);
 				var row = {
@@ -90,4 +83,4 @@ function insertIntoMateData(){
 	});
 }
 
-insertIntoMateData();
+uploadData();
