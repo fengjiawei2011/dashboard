@@ -13,7 +13,7 @@ exports.index = function(req, res){
 	getDataAndPassToFronEndV2(req , res);
 	
 	console.log("finally done");	
-}
+};
 
 
 //***************v2 start*********************************
@@ -36,7 +36,7 @@ function getDataAndPassToFronEndV2(req , res){
 				datasetArrayV2.push(dataset);
 			}	
 		}
-		//console.log(JSON.stringify(datasetArrayV2));
+		console.log(JSON.stringify(datasetArrayV2));
 		timeEnd = new Date().getMilliseconds();
 		console.log("method three take : " + (timeEnd - timeStart));
 		res.render('index1', { title: 'Express', datasets:JSON.stringify(datasetArrayV2)});

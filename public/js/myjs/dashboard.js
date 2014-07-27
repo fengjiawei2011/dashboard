@@ -43,7 +43,7 @@ function Dashboard(datasets){ // datasets is an array
 	 };
 	 
 	 this.drawBackToTopButton = function(){
-		 var html = '<div style="position:fixed;right:10px;top:40%;"><a href="#dashboard" type="button" class="btn btn-info btn-block">Back To Top</a></div>'; 
+		 var html = '<div style="position:fixed;right:25px;top:40%;"><a href="#dashboard" type="button" class="btn btn-info btn-block">Back To Top</a></div>'; 
 		 $('body').append(html);	 	
 	 }
 	 
@@ -65,8 +65,8 @@ function Dashboard(datasets){ // datasets is an array
 	     html    += '</div>';
 	     html    += '<div class="collapse navbar-collapse">';
 	     html    += '<ul class="nav navbar-nav">';
-	    // html    += '<li><a href="#"></a></li>';
 	     html    += '<li class="active"><a data-toggle="collapse" data-target="#monitor" href="#">Monitor <span class="caret"></span></a></li>';
+	     html    += '<li><a href="/upload">upload</a></li>';
 	     html    += '</ul>';
 	     html    += '</div></div></div>';
 	     

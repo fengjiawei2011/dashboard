@@ -28,6 +28,7 @@ exports.insertLastestData = function(row){
 };
 
 exports.insertMateData = function(row){
+	console.log("inserting data = " + JSON.stringify(row));
 	connection.query("INSERT INTO ALERT_MATEDATA SET ?", row , function(err, result){
 		if(err){
 			throw err;
@@ -51,6 +52,8 @@ exports.queryAllAlertDataV2 = function(callback){
 	});	 
 }
 
+
+
 exports.queryAllAlertData = function(callback){
 	var queryString = "SELECT *  FROM ALERT_HISTORY ORDER BY ALERT_TIME";
 	connection.query(queryString, function(err, rows, fields) {
@@ -61,6 +64,20 @@ exports.queryAllAlertData = function(callback){
 	    util.debug("queryAllAlertData() successfully");
 	    callback(rows);
 	});	 
+}
+
+exports.getMetadata = function(id, callback){
+	var queryString = "SELECT * FROM ALERT_MATEDATA WHERE ALERT_ID = '"+id +"'";
+	connection.query(queryString, function(err, rows, fields){
+		
+		if(err){
+			util.debug("getMetadata() ERROR!!! QUERY : " + queryString);
+			throw err;
+		}
+		util.debug("getMetadata() successfully");
+		callback(rows);
+	});
+	
 }
 
 exports.queryAlertDataByAlertIdV1 = function(alertId, callback){
