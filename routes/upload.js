@@ -127,25 +127,25 @@ function uploadMatedata(path, callback){
 		if(err) console.log(err); 
 		for(var i in data){
 			
-			if(data[i][0] === "ALERT_ID" || data[i][0] ==="") continue;
+			if(data[i][0] === "ALERT_ID_1" || data[i][0] ==="") continue;
 			
 			if(!isExist(data[i][0])){
 				matedata.push(data[i][0]);
 				var row = {
 						ALERT_ID       : data[i][0],
-						ALERT_NAME     : data[i][5],
-						QUERY_INFO     : data[i][6],
-						FREQUENCY      : data[i][7],
-						THRESHOLD_VALUE: data[i][8],
-						WARNING_START  : data[i][11],
-						WARNING_END    : data[i][12],
-						ALERT_START    : data[i][13],
-						ALERT_END      : data[i][14] > 999999 ? 999999: data[i][14],
-						ALERT_FLAG     : data[i][9],
-						MAIL_LIST      : data[i][10],
-						TASK_TYPE      : data[i][17]
+						ALERT_NAME     : data[i][1],
+						QUERY_INFO     : data[i][2],
+						FREQUENCY      : data[i][3],
+						THRESHOLD_VALUE: data[i][4],
+						WARNING_START  : data[i][7],
+						WARNING_END    : data[i][8],
+						ALERT_START    : data[i][9],
+						ALERT_END      : data[i][10] > 999999 ? 999999: data[i][10],
+						ALERT_FLAG     : data[i][5],
+						MAIL_LIST      : data[i][6],
+						TASK_TYPE      : data[i][13]
 				};
-				console.log(row);
+				//console.log(row);
 				dao.insertMateData(row);
 			}
 		} 
