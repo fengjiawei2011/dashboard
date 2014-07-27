@@ -1,20 +1,57 @@
 <!DOCTYPE html>
 <html>
-	<head>
+<head>
+<link rel='stylesheet' href='/stylesheets/style.css' />
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<style type="text/css">
+.upload {
+display: none;
+margin-top: 50px;
+}
+</style>
 
-	</head>
+<script type="text/javascript">
+	$(function(){
+		$('button').click(function(){
+			var type = $(this).html()
+			if(type === 'mate-data'){
+				$('.data-upload').hide("fast");
+				$('.matedata-upload').show("fast");
+				
+			}else if(type === 'alert data'){
+				$('.matedata-upload').hide("fast");
+				$('.data-upload').show("fast");
+				
+			}
+		});
+	});
+</script>
+</head>
 
-
-	<body>
+<body>
+	<div><a href="/">Back to Dashboard</a></div>
+	
+	<div>
+		<h3>Choose the type of uploading file</h3>
+		<button>alert data</button>
+		<button>mate-data</button> 
+	</div>
+	<div class="upload data-upload">
+		<div><h4>Upload Alert Data</h4></div>
 		<form action='/upload/datafile' method='post' enctype="multipart/form-data">
-			upload Data: <input type='file' name='file'>
-			<input type='submit'>
+			<input type='file' name='file'><br/>
+			<input type='submit' value="upload data">
 		</form>
-		
-		
+	</div>
+	
+	<div class="upload matedata-upload"> 
+		<div><h4>Upload Mate-data</h4></div>
 		<form action='/upload/matedatafile' method='post' enctype="multipart/form-data">
-			upload MateData: <input type='file' name='file'>
-			<input type='submit'>
+			<input type='file' name='file'><br/>
+			<input type='submit' value="upload matedata">
 		</form>
-	</body>	
+	</div>
+</body>	
 </html>
