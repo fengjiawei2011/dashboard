@@ -7,6 +7,7 @@ var matedata = [];
 exports.upload = function( req , res){
 
 	//res.send('500 ok');
+	throw new Error('test error');
 	res.render('upload');
 };
 

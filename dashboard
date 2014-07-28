@@ -1,0 +1,23 @@
+#! /bin/sh
+
+NODE_ENV=production
+DAEMON="node app.js"
+NAME=dashboard
+DESC=dashboard
+PIDFILE="dashboard.pid"
+case "$1" in
+	start)
+		echo "Starting $DESC: "
+		nohup $DAEMON > /dev/null &
+		echo $! > $PIDFILE
+		echo "$NAME started"
+		;;
+	stop)
+		echo "Stopping $DESC: "
+		pid=`cat $PIDFILE`
+		kill $pid
+		rm $PIDFILE
+		echo "$NAME stoped"
+		;;
+	esac
+	exit 0
