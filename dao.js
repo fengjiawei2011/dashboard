@@ -3,17 +3,17 @@ var mysql = require('mysql');;
 
 var connection = mysql.createConnection({
 	// server connection
-//	host     : '10.72.113.192',
-//	port     : '7771',
-//	user     : 'root',
-//	password : '123!@#qweQWE',
-//	database : 'DFTAlert'
+	host     : '10.72.113.192',
+	port     : '7771',
+	user     : 'root',
+	password : '123!@#qweQWE',
+	database : 'DFTAlert'
 	
     // local connection
-	host     : 'localhost',
-	user     : 'root',
-	password : '',
-	database : 'alert'
+//	host     : 'localhost',
+//	user     : 'root',
+//	password : '',
+//	database : 'alert'
 });
 
 exports.insertLastestData = function(row){	
